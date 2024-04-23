@@ -5,8 +5,10 @@ screen_size = (1540,800)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
 
+black = (0,0,0)
+
 def draw_text(text,size,color,x,y):
-    font = pygame.font.SysFont('corbel',size,bold=True)
+    font = pygame.font.Font("I-pixel-u.ttf",size)
     set_text = font.render(text, True, color)
     rect_text = set_text.get_rect(center=(x,y))
     screen.blit(set_text, rect_text)
@@ -22,6 +24,7 @@ def screen_startup():
                 run = False
 
         screen.fill((200,200,200))
+        draw_text("TASK TREE",80,black,750,400)
         if pygame.mouse.get_pressed()[0] == 1:
             screen_home()
         pygame.display.flip()
