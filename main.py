@@ -31,7 +31,9 @@ def screen_startup():
             if event.type == pygame.QUIT:
                 run = False
 
-        screen.fill(grey)
+    def bg('frontpage.png'):
+        load_image = pygame.image.load('frontpage.png')
+        screen.blit (load_image, (0,0))
         if pygame.mouse.get_pressed()[0] == 1:
             screen_home()
         pygame.display.flip()
