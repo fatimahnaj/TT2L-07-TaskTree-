@@ -5,7 +5,7 @@ screen_size = (1540,800)
 screen = pygame.display.set_mode(screen_size)
 
 class TEXT:
-    def __init__(self,text,x,y,size,normal_color,hover_color):
+    def __init__(self,text,x,y,size,normal_color,hover_color=None):
         self.text = text
         self.x = x
         self.y = y
@@ -28,14 +28,14 @@ class TEXT:
             set_text = font.render(f"{self.text}", True, self.hover_color)
         screen.blit(set_text, rect_text)
 
-def button(x, y, width, height, normal_color, hover_color):
-    set_button = pygame.Rect(x, y, width, height)
-    mouse_x, mouse_y = pygame.mouse.get_pos()
-    if set_button.collidepoint(mouse_x, mouse_y):
-        color = hover_color
-    else:
-        color = normal_color
-    pygame.draw.rect(screen, color, set_button)
+    def button(self,width, height, rect_color):
+        set_button = pygame.Rect(self.x, self.y, width, height)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        pygame.draw.rect(screen, rect_color, set_button)
+        if set_button.collidepoint(mouse_x, mouse_y):
+            return True
+        else:
+            return False
 
 def draw_rectangle(x, y, width, height, color):
     center_x = x - width // 2
