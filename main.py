@@ -57,8 +57,10 @@ def screen_home():
                 if start_stop_button.check_for_input(pygame.mouse.get_pos()):
                     if started:
                         started = False
+                        start_stop_button.update_text("START")
                     else:
                         started = True
+                        start_stop_button.update_text("STOP")
                 if pomodoro_button.check_for_input(pygame.mouse.get_pos()):
                     started = False
                     current_seconds = pomodoro_length

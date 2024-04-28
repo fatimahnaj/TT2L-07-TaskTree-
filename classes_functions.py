@@ -15,18 +15,27 @@ class TEXT:
 
     def display_text(self):
         font = pygame.font.Font("I-pixel-u.ttf",self.size)
-        set_text = font.render(f"{self.text}", True, self.normal_color)
-        rect_text = set_text.get_rect(center=(self.x,self.y))
-        screen.blit(set_text, rect_text)
+        self.rect = font.render(f"{self.text}", True, self.normal_color)
+        self.rect_text = self.rect.get_rect(center=(self.x,self.y))
+        screen.blit(self.rect, self.rect_text)
 
     def hover_color_change(self):
         font = pygame.font.Font("I-pixel-u.ttf",self.size)
-        set_text = font.render(f"{self.text}", True, self.normal_color)
-        rect_text = set_text.get_rect(center=(self.x,self.y))
+        self.rect = font.render(f"{self.text}", True, self.normal_color)
+        self.rect_text = self.rect.get_rect(center=(self.x,self.y))
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        if rect_text.collidepoint(mouse_x, mouse_y):
-            set_text = font.render(f"{self.text}", True, self.hover_color)
-        screen.blit(set_text, rect_text)
+        if self.rect_text.collidepoint(mouse_x, mouse_y):
+            self.rect = font.render(f"{self.text}", True, self.hover_color)
+        screen.blit(self.rect, self.rect_text)
+
+    def update_text(self, new_text):
+        self.text = new_text
+
+    def check_for_input(self,position):
+        self.rect = self.rect.get_rect(center=(self.x,self.y))
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+        return False
 
     def button(self,width, height, rect_color):
         set_button = pygame.Rect(self.x, self.y, width, height)
