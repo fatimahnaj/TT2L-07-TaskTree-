@@ -80,12 +80,6 @@ def screen_home():
                     current_seconds += 1
 
         bg('Design/main room.png')
-        pomodoro_text.hover_color_change()
-        break_text.hover_color_change()
-        timer_text.hover_color_change()
-        pomodoro_timer_text.display_text()
-        screen.fill(dark_grey)
-
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         timer_button.hover_color_change()
