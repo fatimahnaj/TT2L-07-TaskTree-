@@ -11,7 +11,7 @@ pygame.display.set_caption('TaskTree')
 black = (0,0,0)
 grey = (231,231,245)
 dark_grey = (94,99,122)
-blue = (94, 69, 178)
+blue = (39, 39, 89)
 
 pomodoro_length = 10000
 break_length = 300
@@ -25,7 +25,7 @@ stopwatch = False
 pomodoro_button = TEXT("pomodoro",675,120,20,black,blue)
 break_button = TEXT("break",775,120,20,black,blue)
 timer_button = TEXT("timer",855,120,20,black,blue)
-start_stop_button = TEXT("START",755,260,20,grey)
+start_stop_button = TEXT("START",775,270,30,black)
 
 #screen functions
 def screen_startup():
@@ -64,14 +64,17 @@ def screen_home():
                 if pomodoro_button.check_for_input(pygame.mouse.get_pos()):
                     started = False
                     current_seconds = pomodoro_length
+                    start_stop_button.update_text("START")
                     stopwatch = False
                 if break_button.check_for_input(pygame.mouse.get_pos()):
                     started = False
                     current_seconds = break_length
+                    start_stop_button.update_text("START")
                     stopwatch = False
                 if timer_button.check_for_input(pygame.mouse.get_pos()):
                     started = False
                     current_seconds = timer
+                    start_stop_button.update_text("START")
                     stopwatch = True
             if event.type == pygame.USEREVENT and started:
                 if stopwatch == False:
@@ -90,8 +93,8 @@ def screen_home():
             display_seconds = current_seconds % 60
             display_minutes = int(current_seconds / 60) % 60
             display_hour = int(display_minutes / 60) % 60
-        countdown_text = TEXT(f"{display_hour:02}:{display_minutes:02}",755,165,80,black)
-        sec_countdown_text = TEXT(f"{display_seconds:02}",910,180,40,black)
+        countdown_text = TEXT(f"{display_hour:02}:{display_minutes:02}",755,190,90,black)
+        sec_countdown_text = TEXT(f"{display_seconds:02}",930,210,45,black)
         countdown_text.display_text()
         sec_countdown_text.display_text()
 
