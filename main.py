@@ -36,8 +36,8 @@ def screen_startup():
             if event.type == pygame.QUIT:
                 run = False
 
-        screen.fill(grey)
-        if pygame.mouse.get_pressed()[0] == 1:
+        bg('Design/frontpage.png')
+        if pygame.mouse.get_pressed()[0] == 1: 
             screen_home()
         
         pygame.display.flip()
@@ -79,6 +79,11 @@ def screen_home():
                 else:
                     current_seconds += 1
 
+        bg('Design/main room.png')
+        pomodoro_text.hover_color_change()
+        break_text.hover_color_change()
+        timer_text.hover_color_change()
+        pomodoro_timer_text.display_text()
         screen.fill(dark_grey)
 
         pomodoro_button.hover_color_change()
