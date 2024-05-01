@@ -96,7 +96,40 @@ def screen_home():
         sec_countdown_text.display_text()
 
         pygame.display.flip()
-        
+
     pygame.quit()
+
+def screen_settings() :
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        screen.fill((64, 64, 64))
+        if pygame.mouse.get_pressed()[0] == 1: 
+            screen_settings()
+        
+        pygame.display.flip()
+
+    pygame.quit()
+
+def screen_tree() :
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        screen.fill((0, 128, 0))
+        if pygame.mouse.get_pressed()[0] == 1: 
+            screen_tree()
+        
+        pygame.display.flip()
+
+    pygame.quit()
+        
 
 screen_startup()
