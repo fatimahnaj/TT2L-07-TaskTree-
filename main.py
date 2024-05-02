@@ -13,7 +13,7 @@ grey = (231,231,245)
 dark_grey = (94,99,122)
 blue = (94, 69, 178)
 
-pomodoro_length = 10000
+pomodoro_length = 1800
 break_length = 300
 timer = 0
 
