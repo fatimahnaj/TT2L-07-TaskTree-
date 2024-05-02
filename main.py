@@ -22,10 +22,10 @@ pygame.time.set_timer(pygame.USEREVENT, 1000)
 started = False
 stopwatch = False
 
-pomodoro_button = TEXT("pomodoro",675,120,20,black,blue)
-break_button = TEXT("break",775,120,20,black,blue)
-timer_button = TEXT("timer",855,120,20,black,blue)
-start_stop_button = TEXT("START",755,260,20,grey)
+pomodoro_button = TEXT("pomodoro",690,120,20,black,blue)
+break_button = TEXT("break",790,120,20,black,blue)
+timer_button = TEXT("timer",870,120,20,black,blue)
+start_stop_button = TEXT("START",795,260,20,dark_grey)
 
 #screen functions
 def screen_startup():
