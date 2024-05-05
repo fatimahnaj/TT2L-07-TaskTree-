@@ -4,7 +4,9 @@ pygame.init()
 screen_size = (1540,800)
 screen = pygame.display.set_mode(screen_size)
 
-class TEXT():
+black = (0,0,0)
+
+class TEXT:
     def __init__(self,text,x,y,size,normal_color,hover_color=None):
         self.text = text
         self.x = x
@@ -37,40 +39,58 @@ class TEXT():
             return True
         return False
 
-    def button(self,width, height, rect_color):
-        set_button = pygame.Rect(self.x, self.y, width, height)
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        pygame.draw.rect(screen, rect_color, set_button)
-        if set_button.collidepoint(mouse_x, mouse_y):
+#fatim punya button
+class BUTTON:
+    def __init__(self, x, y, width=0, height=0, color=black):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.center_x = self.x - self.width // 2
+        self.center_y = self.y - self.height // 2
+
+    def draw_button(self):
+        set_button = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        pygame.draw.rect(screen, self.color, set_button)
+
+    def image_button(self,image_link):
+        image = pygame.image.load(image_link)
+        screen.blit(image, (self.x, self.y))
+
+    def check_for_input(self,position):
+        rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
-        else:
-            return False
-
-def draw_rectangle(x, y, width, height, color):
-    center_x = x - width // 2
-    center_y = y - height // 2
-    set_box = pygame.Rect(center_x, center_y, width, height)
-    pygame.draw.rect(screen, color, set_box)
-
+        return False
+    
 def bg(image_link):
     load_image = pygame.image.load(image_link)
     screen.blit(load_image, (0,0))
 
+def convert_time(time,x,y,size):
+    display_minutes = int(time / 60)
+    display_time = TEXT(f"{display_minutes:02}",x,y,size,black)
+    display_time.display_text()
+
+#anisah punya button
 class Button():
-    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+    def __init__(self, image, pos, text_input, text_size, base_color, hovering_color):
         self.image = image
         self.x_pos = pos[0]
-        self.y_pos = [1]
-        self.font = font
+        self.y_pos = pos[1]
+        self.font = pygame.font.Font("I-pixel-u.ttf", text_size)
         self.base_color, self.hovering_color = base_color, hovering_color
         self.text_input = text_input
         self.text = self.font.render(self.text_input, True, self.base_color)
         if self.image is None :
             self.image = self.text
+        else:
+            self.image = pygame.transform.smoothscale(self.image, (width, height))
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
 
-    def update(self, screen):
+    def update(self, screen=screen):
         if self.image is not None :
             screen.blit(self.image, self.rect)
         screen.blit(self.text, self.text_rect)
