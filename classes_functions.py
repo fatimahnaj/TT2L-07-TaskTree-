@@ -4,6 +4,8 @@ pygame.init()
 screen_size = (1540,800)
 screen = pygame.display.set_mode(screen_size)
 
+black = (0,0,0)
+
 class TEXT:
     def __init__(self,text,x,y,size,normal_color,hover_color=None):
         self.text = text
@@ -37,21 +39,33 @@ class TEXT:
             return True
         return False
 
-    def button(self,width, height, rect_color):
-        set_button = pygame.Rect(self.x, self.y, width, height)
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        pygame.draw.rect(screen, rect_color, set_button)
-        if set_button.collidepoint(mouse_x, mouse_y):
+class BUTTON:
+    def __init__(self, x, y, width, height, color):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.color = color
+        self.center_x = self.x - self.width // 2
+        self.center_y = self.y - self.height // 2
+
+    def draw_button(self):
+        set_button = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        pygame.draw.rect(screen, self.color, set_button)
+
+    def check_for_input(self,position):
+        rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
-        else:
-            return False
+        return False
 
-def draw_rectangle(x, y, width, height, color):
-    center_x = x - width // 2
-    center_y = y - height // 2
-    set_box = pygame.Rect(center_x, center_y, width, height)
-    pygame.draw.rect(screen, color, set_box)
-
+        
 def bg(image_link):
     load_image = pygame.image.load(image_link)
     screen.blit(load_image, (0,0))
+
+def convert_time(time,x,y,size):
+    display_minutes = int(time / 60) % 60
+    display_hour = int(time / 3600) % 60
+    display_time = TEXT(f"{display_hour}h {display_minutes:02}min",x,y,size,black)
+    display_time.display_text()
