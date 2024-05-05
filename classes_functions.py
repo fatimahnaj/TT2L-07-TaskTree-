@@ -104,3 +104,31 @@ class Button():
             self.text = self.font.render(self.text_input, True, self.hovering_color)
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
+
+#Level Bar
+class LevelBar():
+    def __init__(self, x, y, w, h, level):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.xp = 0
+        self.max_xp = 30
+        self.level = level
+    
+    def draw(self, surface):
+        #calculate level ratio
+        ratio = self.xp / self.max_xp
+        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
+        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+
+    def addXP(self, increment):
+        self.xp += increment
+        if self.xp >= self.max_xp:
+            excess = self.xp - self.max_xp 
+            self.max_xp += 10
+            self.level += 1
+            self.xp = 0 + excess
+
+
+
