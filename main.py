@@ -218,4 +218,4 @@ def screen_settings():
 
     pygame.quit()
 
-screen_home()
+screen_startup()
