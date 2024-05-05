@@ -6,7 +6,7 @@ screen = pygame.display.set_mode(screen_size)
 
 black = (0,0,0)
 
-class TEXT():
+class TEXT:
     def __init__(self,text,x,y,size,normal_color,hover_color=None):
         self.text = text
         self.x = x
@@ -39,8 +39,9 @@ class TEXT():
             return True
         return False
 
+#fatim punya button
 class BUTTON:
-    def __init__(self, x, y, width, height, color):
+    def __init__(self, x, y, width, height, color=None):
         self.x = x
         self.y = y
         self.width = width
@@ -58,18 +59,17 @@ class BUTTON:
         if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
         return False
-
-        
+    
 def bg(image_link):
     load_image = pygame.image.load(image_link)
     screen.blit(load_image, (0,0))
 
 def convert_time(time,x,y,size):
     display_minutes = int(time / 60) % 60
-    display_hour = int(time / 3600) % 60
-    display_time = TEXT(f"{display_hour}h {display_minutes:02}min",x,y,size,black)
+    display_time = TEXT(f"{display_minutes:02}",x,y,size,black)
     display_time.display_text()
-    
+
+#anisah punya button
 class Button():
     def __init__(self, image, pos, text_input, font, base_color, hovering_color):
         self.image = image

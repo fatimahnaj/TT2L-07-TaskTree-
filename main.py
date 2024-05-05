@@ -28,12 +28,14 @@ stopwatch = False
 pomodoro = True
 
 pomodoro_button = TEXT("pomodoro",675,120,20,black,blue)
-break_button = TEXT("break",775,120,20,black,blue)
-stopwatch_button = TEXT("stopwatch",880,120,20,black,blue)
+break_button = TEXT("break",790,120,20,black,blue)
+stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
 start_stop_button = TEXT("START",775,270,30,black)
 
-increase_pomodoro = BUTTON(400, 300, 50, 20, grey)
-decrease_pomodoro = BUTTON(400, 330, 50, 20, grey)
+increase_pomodoro = BUTTON(245, 325, 40, 20)
+decrease_pomodoro = BUTTON(245, 350, 40, 20)
+increase_break = BUTTON(245, 487, 40, 20)
+decrease_break = BUTTON(245, 510, 40, 20)
 
 #screen functions
 def screen_startup():
@@ -163,25 +165,40 @@ def screen_settings():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                #pomodoro settings
                 if increase_pomodoro.check_for_input(pygame.mouse.get_pos()):
-                    pomodoro_length = pomodoro_length + 300
-                    print(pomodoro_length)
+                    if pomodoro_length == 3300:
+                        pomodoro_length = pomodoro_length
+                    else:
+                        pomodoro_length = pomodoro_length + 300
+                        print(pomodoro_length)
                 if decrease_pomodoro.check_for_input(pygame.mouse.get_pos()):
                     if pomodoro_length > 300:
                         pomodoro_length = pomodoro_length - 300
                         print(pomodoro_length)
                     else:
                         pomodoro_length = pomodoro_length
-
+                #break settings
+                if increase_break.check_for_input(pygame.mouse.get_pos()):
+                    if break_length == 3310:
+                        break_length = break_length
+                    else:
+                        break_length = break_length + 300
+                        print(break_length)
+                if decrease_break.check_for_input(pygame.mouse.get_pos()):
+                    if break_length > 300:
+                        break_length = break_length - 300
+                        print(break_length)
+                    else:
+                        break_length = break_length
 
         
-        screen.fill((dark_grey))
-        increase_pomodoro.draw_button()
-        decrease_pomodoro.draw_button()
-        convert_time(pomodoro_length,260,310,40)
+        bg('Design/setting page.png')
+        convert_time(pomodoro_length,180,330,60)
+        convert_time(break_length,180,495,60)
 
         pygame.display.flip()
 
     pygame.quit()
 
-screen_settings()
+screen_home()
