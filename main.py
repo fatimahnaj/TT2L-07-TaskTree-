@@ -149,7 +149,7 @@ def screen_home():
         sec_countdown_text.display_text()
 
         pygame.display.flip()
-        
+
     pygame.quit()
 
 def screen_settings():
