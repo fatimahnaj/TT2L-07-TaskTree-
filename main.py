@@ -4,6 +4,8 @@ from classes_functions import *
 pygame.init()
 
 screen_size = (1540,800)
+screen_width = screen_size[0]
+screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
 
@@ -32,10 +34,16 @@ break_button = TEXT("break",790,120,20,black,blue)
 stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
 start_stop_button = TEXT("START",775,270,30,black)
 
+settings = BUTTON(0,0)
+settings_button = BUTTON((screen_width-74),67,72,69)
+back = BUTTON(0,0)
+back_button = BUTTON((screen_width-115),75,110,100)
+
 increase_pomodoro = BUTTON(245, 325, 40, 20)
 decrease_pomodoro = BUTTON(245, 350, 40, 20)
 increase_break = BUTTON(245, 487, 40, 20)
 decrease_break = BUTTON(245, 510, 40, 20)
+
 
 #screen functions
 def screen_startup():
@@ -103,6 +111,10 @@ def screen_home():
                         pomodoro = False
                     else:
                         current_seconds = current_seconds
+                #settings button
+                if settings_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_settings()
+                    print("Switching to settings screen.")
             #counting the time
             if event.type == pygame.USEREVENT and started:
                 if stopwatch:
@@ -134,12 +146,13 @@ def screen_home():
                                     start_stop_button.update_text("START")
                                     print("finish lap")
 
+
         bg('Design/main room.png')
+        settings.image_button('Design/setting-button1.png')
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
         start_stop_button.display_text()
-
         
         if current_seconds >= 0:
             display_seconds = current_seconds % 60
@@ -158,7 +171,7 @@ def screen_settings():
     run = True
     while run:
 
-        global pomodoro_length,break_length,lap_length
+        global pomodoro_length,break_length,lap_length,current_seconds
 
 
         for event in pygame.event.get():
@@ -167,7 +180,7 @@ def screen_settings():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #pomodoro settings
                 if increase_pomodoro.check_for_input(pygame.mouse.get_pos()):
-                    if pomodoro_length == 3300:
+                    if pomodoro_length == 3600:
                         pomodoro_length = pomodoro_length
                     else:
                         pomodoro_length = pomodoro_length + 300
@@ -191,9 +204,13 @@ def screen_settings():
                         print(break_length)
                     else:
                         break_length = break_length
+                if back_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home()
+                    print("Returning to homescreen")
 
         
         bg('Design/setting page.png')
+        back.image_button('Design/back-button.png')
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
 
