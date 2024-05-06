@@ -45,7 +45,7 @@ increase_break = BUTTON(245, 487, 40, 20)
 decrease_break = BUTTON(245, 510, 40, 20)
 
 start = BUTTON(20, 20)
-start_button = BUTTON((screen_width-650),550,100,300) 
+start_button = BUTTON(790, 440, 400, 170) 
 
 plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
