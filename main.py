@@ -47,7 +47,7 @@ decrease_break = BUTTON(245, 510, 40, 20)
 #Level Points
 point_per_second = 1/60
 level_xp_increment = 10
-level_bar = LevelBar(200, 200, 300, 40, 0)
+level_bar = LevelBar(60, 80, 200, 30, 0)
 
 
 #screen functions
@@ -181,7 +181,7 @@ def screen_home():
         #draw level bar
         level_bar.draw(screen)
 
-        level_text = TEXT("Level " + str(level_bar.level), level_bar.x, level_bar.y, 45, black)
+        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
         level_text.display_text()
 
         pygame.display.flip()
