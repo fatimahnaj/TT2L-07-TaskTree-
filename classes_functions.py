@@ -119,8 +119,8 @@ class LevelBar():
     def draw(self, surface):
         #calculate level ratio
         ratio = self.xp / self.max_xp
-        pygame.draw.rect(surface, "red", (self.x, self.y, self.w, self.h))
-        pygame.draw.rect(surface, "green", (self.x, self.y, self.w * ratio, self.h))
+        pygame.draw.rect(surface, "white", (self.x, self.y, self.w, self.h))
+        pygame.draw.rect(surface, "orange", (self.x, self.y, self.w * ratio, self.h))
 
     def addXP(self, increment):
         self.xp += increment
