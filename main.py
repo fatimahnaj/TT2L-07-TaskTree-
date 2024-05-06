@@ -49,8 +49,6 @@ start_button = BUTTON(790, 440, 400, 170)
 
 plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
-home = BUTTON(0, 0)
-home_button = BUTTON(90, 390, 70, 70)
 garden = BUTTON(0, 0)
 garden_button = BUTTON(90, 490, 70, 70)
 
@@ -173,7 +171,6 @@ def screen_home():
         bg('Design/main room.png')
         settings.image_button('Design/setting-button1.png')
         plant.image_button('Design/plant-button.png')
-        home.image_button('Design/home-button.png')
         garden.image_button('Design/garden-button.png')
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
