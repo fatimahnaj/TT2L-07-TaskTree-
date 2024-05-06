@@ -16,7 +16,7 @@ dark_grey = (94,99,122)
 blue = (39, 39, 89)
 
 #in seconds
-pomodoro_length = 300
+pomodoro_length = 10
 break_length = 10
 timer = 0
 
@@ -44,6 +44,11 @@ decrease_pomodoro = BUTTON(245, 350, 40, 20)
 increase_break = BUTTON(245, 487, 40, 20)
 decrease_break = BUTTON(245, 510, 40, 20)
 
+#Level Points
+point_per_second = 1/60
+level_xp_increment = 10
+level_bar = LevelBar(200, 200, 300, 40, 0)
+
 
 #screen functions
 def screen_startup():
@@ -64,6 +69,7 @@ def screen_startup():
 
 def screen_home():
     run = True
+
     while run:
 
         global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length
@@ -125,6 +131,10 @@ def screen_home():
                             current_seconds -= 1
                         elif current_seconds == 0:
                                 if pomodoro:
+                                    print("pomodoro completed")
+                                    # level_bar.addXP(pomodoro_length * point_per_second)
+                                    level_bar.addXP(20)
+                                    level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro = False
                                 else:
@@ -137,6 +147,10 @@ def screen_home():
                             current_seconds -= 1
                         elif current_seconds == 0:
                                 if pomodoro:
+                                    print("pomodoro completed")
+                                    # level_bar.addXP(pomodoro_length * point_per_second)
+                                    level_bar.addXP(20)
+                                    level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro = False
                                 else:
@@ -162,6 +176,13 @@ def screen_home():
         sec_countdown_text = TEXT(f"{display_seconds:02}",930,210,45,black)
         countdown_text.display_text()
         sec_countdown_text.display_text()
+
+
+        #draw level bar
+        level_bar.draw(screen)
+
+        level_text = TEXT("Level " + str(level_bar.level), level_bar.x, level_bar.y, 45, black)
+        level_text.display_text()
 
         pygame.display.flip()
 
