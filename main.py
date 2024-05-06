@@ -44,19 +44,35 @@ decrease_pomodoro = BUTTON(245, 350, 40, 20)
 increase_break = BUTTON(245, 487, 40, 20)
 decrease_break = BUTTON(245, 510, 40, 20)
 
+start = BUTTON(20, 20)
+start_button = BUTTON((screen_width-650),550,100,300) 
+
+plant = BUTTON(0, 0)
+plant_button = BUTTON(90, 290, 70, 70)
+home = BUTTON(0, 0)
+home_button = BUTTON(90, 390, 70, 70)
+garden = BUTTON(0, 0)
+garden_button = BUTTON(90, 490, 70, 70)
+
+
+
 
 #screen functions
 def screen_startup():
     run = True
     while run:
-
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            #start button
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home()
+                    print("Switching to home screen.")
 
         bg('Design/frontpage.png')
-        if pygame.mouse.get_pressed()[0] == 1: 
-            screen_home()
+        start.image_button('Design/frontpage-button1.png')
         
         pygame.display.flip()
 
@@ -115,6 +131,14 @@ def screen_home():
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
                     print("Switching to settings screen.")
+                #plant button
+                if plant_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_plant()
+                    print("Switching to plant screen.")
+                #garden button
+                if garden_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_garden()
+                    print("Switching to garden screen.")
             #counting the time
             if event.type == pygame.USEREVENT and started:
                 if stopwatch:
@@ -146,9 +170,11 @@ def screen_home():
                                     start_stop_button.update_text("START")
                                     print("finish lap")
 
-
         bg('Design/main room.png')
         settings.image_button('Design/setting-button1.png')
+        plant.image_button('Design/plant-button.png')
+        home.image_button('Design/home-button.png')
+        garden.image_button('Design/garden-button.png')
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
@@ -213,6 +239,44 @@ def screen_settings():
         back.image_button('Design/back-button.png')
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
+
+        pygame.display.flip()
+
+    pygame.quit()
+
+def screen_plant() :
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home()
+                    print("Returning to homescreen")
+
+        bg('Design/plant1.png')
+        back.image_button('Design/back-button.png')
+
+        pygame.display.flip()
+
+    pygame.quit()
+
+def screen_garden() :
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home()
+                    print("Returning to homescreen")
+
+        bg('Design/garden.png')
+        back.image_button('Design/back-button.png')
 
         pygame.display.flip()
 
