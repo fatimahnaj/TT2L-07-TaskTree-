@@ -62,6 +62,15 @@ shop_button = BUTTON(60, 290, 100, 80)
 shop_back = BUTTON(345, 300, 100,80)
 
 
+#user input for todo list
+user_input = ""
+input_text = TEXT(user_input, 780,350,20, grey, grey,"DePixelHalbfett.ttf")
+add_task_text = TEXT("Todo list :", 1250, 525, 20, dark_grey, dark_grey,"DePixelHalbfett.ttf")
+add_task_button = BUTTON(screen_width-70, screen_height-80, 50, 50, black)
+input_your_text = TEXT("Enter your task for today !", 800, 200, 30, blue, blue,"DePixelHalbfett.ttf")
+todo_lists = [""]
+todo1 = ""
+todo1_text = TEXT(todo1, 1250, 570, 18, grey, grey,"DePixelHalbfett.ttf")
 
 
 #screen functions
@@ -91,6 +100,7 @@ def screen_home():
     while run:
 
         global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,6 +145,9 @@ def screen_home():
                         pomodoro = False
                     else:
                         current_seconds = current_seconds
+                #add to do list button
+                if add_task_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_user_input()
                 #settings button
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
@@ -194,6 +207,11 @@ def screen_home():
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
         start_stop_button.display_text()
+        taskboard = pygame.Rect(1000, 500, 500, 250)
+        pygame.draw.rect(screen, grey, taskboard)
+        add_task_text.display_text()
+        add_task_button.draw_button()
+        todo1_text.display_text()
         
         if current_seconds >= 0:
             display_seconds = current_seconds % 60
@@ -210,6 +228,47 @@ def screen_home():
 
         level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
         level_text.display_text()
+
+        pygame.display.flip()
+
+    pygame.quit()
+
+def screen_user_input():
+    run = True
+    while run:
+
+        global user_input,todo1
+        user_input_limit = 300
+        user_input_length = input_text.check_text_length(user_input)
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            #input_text
+            if event.type == pygame.TEXTINPUT:
+                if user_input_length < user_input_limit:
+                    user_input += event.text
+                else:
+                    user_input = user_input
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    user_input = user_input[:-1]
+                if event.key == pygame.K_RETURN:
+                    todo_lists.append(user_input)
+                    todo1 = todo_lists[1]
+                    todo1_text.update_text(todo1)
+                    todo1_text.update_color(black)
+                    user_input = ""
+                    input_text.update_text(user_input)
+                    screen_home()
+        
+        screen.fill(grey)
+        input_your_text.display_text()
+        input_box = pygame.Rect(500,280, 600, 150)
+        pygame.draw.rect(screen, blue, input_box)
+        input_text.display_text()
+        input_text.update_text(user_input)
 
         pygame.display.flip()
 
@@ -326,4 +385,4 @@ def screen_shop() :
 
     pygame.quit()
 
-screen_startup()
+screen_home()
