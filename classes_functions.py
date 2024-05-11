@@ -7,22 +7,23 @@ screen = pygame.display.set_mode(screen_size)
 black = (0,0,0)
 
 class TEXT:
-    def __init__(self,text,x,y,size,normal_color,hover_color=None):
+    def __init__(self,text,x,y,size,normal_color,hover_color=None,font="I-pixel-u.ttf"):
         self.text = text
         self.x = x
         self.y = y
         self.size = size
         self.normal_color = normal_color
         self.hover_color = hover_color
+        self.font = font
 
     def display_text(self):
-        font = pygame.font.Font("I-pixel-u.ttf",self.size)
+        font = pygame.font.Font(self.font,self.size)
         self.rect = font.render(f"{self.text}", True, self.normal_color)
         self.rect_text = self.rect.get_rect(center=(self.x,self.y))
         screen.blit(self.rect, self.rect_text)
 
     def hover_color_change(self):
-        font = pygame.font.Font("I-pixel-u.ttf",self.size)
+        font = pygame.font.Font(self.font,self.size)
         self.rect = font.render(f"{self.text}", True, self.normal_color)
         self.rect_text = self.rect.get_rect(center=(self.x,self.y))
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -33,12 +34,21 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
+    def update_color(self, new_color):
+        self.normal_color = new_color
+
     def check_for_input(self,position):
         self.rect = self.rect.get_rect(center=(self.x,self.y))
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             return True
         return False
-
+    
+    def check_text_length(self,input):
+        font = pygame.font.Font("I-pixel-u.ttf",self.size)
+        self.rect = font.render(f"{self.text}", True, self.normal_color)
+        text_width, text_height = font.size(input)
+        return text_width
+    
 #fatim punya button
 class BUTTON:
     def __init__(self, x, y, width=0, height=0, color=black):
