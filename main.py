@@ -57,6 +57,10 @@ plant_button = BUTTON(90, 290, 70, 70)
 garden = BUTTON(0, 0)
 garden_button = BUTTON(90, 490, 70, 70)
 
+shop = BUTTON(0, 0)
+shop_button = BUTTON(60, 290, 100, 80)
+shop_back = BUTTON(345, 300, 100,80)
+
 
 
 
@@ -273,9 +277,14 @@ def screen_plant() :
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     screen_home()
                     print("Returning to homescreen")
+                #shop button
+                if shop_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_shop()
+                    print("Switching to shop screen.")
 
         bg('Design/plant1.png')
         back.image_button('Design/back-button.png')
+        shop.image_button('Design/shop-button.png')
 
         pygame.display.flip()
 
@@ -295,6 +304,23 @@ def screen_garden() :
 
         bg('Design/garden.png')
         back.image_button('Design/back-button.png')
+
+        pygame.display.flip()
+
+    pygame.quit()
+
+def screen_shop() :
+    run = True
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if shop_back.check_for_input(pygame.mouse.get_pos()):
+                    screen_plant()
+                    print("Returning to plant screen")
+        bg('Design/shop-page.png')
 
         pygame.display.flip()
 
