@@ -50,7 +50,11 @@ level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
 
 start = BUTTON(20, 20)
-start_button = BUTTON(790, 440, 400, 170) 
+start_button = BUTTON(790, 440, 400, 170)
+
+sunny_bg = BUTTON(1200, 330, 50, 50)
+night_bg = BUTTON(1350, 330, 50, 50)
+snow_bg = BUTTON(1450, 330, 50, 50)
 
 plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
@@ -60,6 +64,9 @@ garden_button = BUTTON(90, 490, 70, 70)
 shop = BUTTON(0, 0)
 shop_button = BUTTON(60, 290, 100, 80)
 shop_back = BUTTON(345, 300, 100,80)
+
+water_plant = BUTTON(120, 400, 120, 50)
+fertilizer = BUTTON(120, 570, 120, 50)
 
 
 #user input for todo list
@@ -76,6 +83,7 @@ todo1_text = TEXT(todo1, 1250, 570, 18, grey, grey,"DePixelHalbfett.ttf")
 #screen functions
 def screen_startup():
     run = True
+    selected_background = 'Design/sunny.png'
     while run:
         
         for event in pygame.event.get():
@@ -84,7 +92,7 @@ def screen_startup():
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Switching to home screen.")
 
         bg('Design/frontpage.png')
@@ -94,9 +102,8 @@ def screen_startup():
 
     pygame.quit()
 
-def screen_home():
+def screen_home(selected_background):
     run = True
-
     while run:
 
         global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length
@@ -199,7 +206,7 @@ def screen_home():
                                     start_stop_button.update_text("START")
                                     print("finish lap")
 
-        bg('Design/main room.png')
+        bg(selected_background)
         settings.image_button('Design/setting-button1.png')
         plant.image_button('Design/plant-button.png')
         garden.image_button('Design/garden-button.png')
@@ -245,6 +252,10 @@ def screen_user_input():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home(selected_background)
+                    print("Returning to homescreen")
             #input_text
             if event.type == pygame.TEXTINPUT:
                 if user_input_length < user_input_limit:
@@ -261,9 +272,10 @@ def screen_user_input():
                     todo1_text.update_color(black)
                     user_input = ""
                     input_text.update_text(user_input)
-                    screen_home()
+                    screen_home(selected_background)
         
         screen.fill(grey)
+        back.image_button('Design/back-button.png')
         input_your_text.display_text()
         input_box = pygame.Rect(500,280, 600, 150)
         pygame.draw.rect(screen, blue, input_box)
@@ -275,6 +287,9 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
+    global selected_background
+    selected_background = 'Design/sunny.png'
+
     run = True
     while run:
 
@@ -311,8 +326,22 @@ def screen_settings():
                         print(break_length)
                     else:
                         break_length = break_length
+                #ambience buttons
+                if sunny_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/sunny.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                if night_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/night.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                if snow_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/snow.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
 
         
@@ -334,7 +363,7 @@ def screen_plant() :
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
                 #shop button
                 if shop_button.check_for_input(pygame.mouse.get_pos()):
@@ -358,7 +387,7 @@ def screen_garden() :
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
 
         bg('Design/garden.png')
@@ -368,10 +397,19 @@ def screen_garden() :
 
     pygame.quit()
 
-def screen_shop() :
+def screen_shop():
     run = True
-    while run:
+    clock = pygame.time.Clock()
+    show_watering_can = False
+    watering_can_start_time = 0
+    watering_can_duration = 800  
+    show_fertilizer = False
+    fertilizer_start_time = 0
+    fertilizer_duration = 800  
+    background_image = pygame.image.load('Design/shop-page.png').convert()
 
+    while run:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -379,10 +417,45 @@ def screen_shop() :
                 if shop_back.check_for_input(pygame.mouse.get_pos()):
                     screen_plant()
                     print("Returning to plant screen")
-        bg('Design/shop-page.png')
+                if water_plant.check_for_input(pygame.mouse.get_pos()):
+                    show_watering_can = True
+                    watering_can_start_time = pygame.time.get_ticks()  # Record the start time
+                if fertilizer.check_for_input(pygame.mouse.get_pos()):
+                    show_fertilizer = True
+                    fertilizer_start_time = pygame.time.get_ticks()  # Record the start time
+
+        # Blit the background image
+        screen.blit(background_image, (0, 0))
+
+        # Check if we need to show the watering can image
+        if show_watering_can:
+            current_time = pygame.time.get_ticks()
+            if current_time - watering_can_start_time < watering_can_duration:
+                # Load the watering can image
+                watering_can_image = pygame.image.load('Design/watering-can.png').convert_alpha()
+                # Calculate its position to center it on the screen
+                watering_can_rect = watering_can_image.get_rect(center=(screen_width / 2, screen_height / 2))
+                # Blit the watering can image
+                screen.blit(watering_can_image, watering_can_rect)
+            else:
+                show_watering_can = False
+                
+        if show_fertilizer:
+            current_time = pygame.time.get_ticks()
+            if current_time - fertilizer_start_time < fertilizer_duration:
+                # Load the watering can image
+                fertilizer_image = pygame.image.load('Design/fertilizer.png').convert_alpha()
+                # Calculate its position to center it on the screen
+                fertilizer_rect = fertilizer_image.get_rect(center=(screen_width / 2, screen_height / 2))
+                # Blit the watering can image
+                screen.blit(fertilizer_image, fertilizer_rect)
+            else:
+                show_fertilizer = False
+
 
         pygame.display.flip()
+        clock.tick(60)  # Limit frame rate to 60 FPS
 
     pygame.quit()
 
-screen_home()
+screen_startup()
