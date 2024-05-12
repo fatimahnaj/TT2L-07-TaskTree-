@@ -50,7 +50,11 @@ level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
 
 start = BUTTON(20, 20)
-start_button = BUTTON(790, 440, 400, 170) 
+start_button = BUTTON(790, 440, 400, 170)
+
+sunny_bg = BUTTON(1200, 330, 50, 50)
+night_bg = BUTTON(1350, 330, 50, 50)
+snow_bg = BUTTON(1450, 330, 50, 50)
 
 plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
@@ -79,6 +83,7 @@ todo1_text = TEXT(todo1, 1250, 570, 18, grey, grey,"DePixelHalbfett.ttf")
 #screen functions
 def screen_startup():
     run = True
+    selected_background = 'Design/sunny.png'
     while run:
         
         for event in pygame.event.get():
@@ -87,7 +92,7 @@ def screen_startup():
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Switching to home screen.")
 
         bg('Design/frontpage.png')
@@ -97,9 +102,8 @@ def screen_startup():
 
     pygame.quit()
 
-def screen_home():
+def screen_home(selected_background):
     run = True
-
     while run:
 
         global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length
@@ -202,7 +206,7 @@ def screen_home():
                                     start_stop_button.update_text("START")
                                     print("finish lap")
 
-        bg('Design/main room.png')
+        bg(selected_background)
         settings.image_button('Design/setting-button1.png')
         plant.image_button('Design/plant-button.png')
         garden.image_button('Design/garden-button.png')
@@ -250,7 +254,7 @@ def screen_user_input():
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
             #input_text
             if event.type == pygame.TEXTINPUT:
@@ -268,7 +272,7 @@ def screen_user_input():
                     todo1_text.update_color(black)
                     user_input = ""
                     input_text.update_text(user_input)
-                    screen_home()
+                    screen_home(selected_background)
         
         screen.fill(grey)
         back.image_button('Design/back-button.png')
@@ -283,6 +287,9 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
+    global selected_background
+    selected_background = 'Design/sunny.png'
+
     run = True
     while run:
 
@@ -319,8 +326,22 @@ def screen_settings():
                         print(break_length)
                     else:
                         break_length = break_length
+                #ambience buttons
+                if sunny_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/sunny.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                if night_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/night.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                if snow_bg.check_for_input(pygame.mouse.get_pos()):
+                    selected_background = 'Design/snow.png'
+                    screen_home(selected_background)
+                    print("Switching to homescreen")
+                #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
 
         
@@ -342,7 +363,7 @@ def screen_plant() :
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
                 #shop button
                 if shop_button.check_for_input(pygame.mouse.get_pos()):
@@ -366,7 +387,7 @@ def screen_garden() :
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home()
+                    screen_home(selected_background)
                     print("Returning to homescreen")
 
         bg('Design/garden.png')
