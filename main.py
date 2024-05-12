@@ -248,6 +248,10 @@ def screen_user_input():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_home()
+                    print("Returning to homescreen")
             #input_text
             if event.type == pygame.TEXTINPUT:
                 if user_input_length < user_input_limit:
@@ -267,6 +271,7 @@ def screen_user_input():
                     screen_home()
         
         screen.fill(grey)
+        back.image_button('Design/back-button.png')
         input_your_text.display_text()
         input_box = pygame.Rect(500,280, 600, 150)
         pygame.draw.rect(screen, blue, input_box)
