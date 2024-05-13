@@ -226,7 +226,7 @@ def screen_home():
         #draw level bar
         level_bar.draw(screen)
 
-        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
+        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, blackti)
         level_text.display_text()
 
         pygame.display.flip()
