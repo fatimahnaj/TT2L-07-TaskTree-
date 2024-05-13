@@ -34,9 +34,6 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
-    def update_color(self, new_color):
-        self.normal_color = new_color
-
     def check_for_input(self,position):
         self.rect = self.rect.get_rect(center=(self.x,self.y))
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
@@ -67,6 +64,9 @@ class BUTTON:
     def image_button(self,image_link):
         image = pygame.image.load(image_link)
         screen.blit(image, (self.x, self.y))
+
+    def update_color(self, new_color):
+        self.color = new_color
 
     def check_for_input(self,position):
         rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
