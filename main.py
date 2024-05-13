@@ -16,8 +16,8 @@ dark_grey = (94,99,122)
 blue = (39, 39, 89)
 
 #in seconds
-pomodoro_length = 10
-break_length = 10
+pomodoro_length = 1800
+break_length = 300
 timer = 0
 
 lap_length = 3
@@ -38,6 +38,8 @@ settings = BUTTON(0,0)
 settings_button = BUTTON((screen_width-74),67,72,69)
 back = BUTTON(0,0)
 back_button = BUTTON((screen_width-115),75,110,100)
+minute_text1 = TEXT("minute",313,370,15,grey,grey,"DePixelHalbfett.ttf")
+minute_text2 = TEXT("minute",313,530,15,grey,grey,"DePixelHalbfett.ttf")
 
 increase_pomodoro = BUTTON(245, 325, 40, 20)
 decrease_pomodoro = BUTTON(245, 350, 40, 20)
@@ -52,6 +54,7 @@ level_bar = LevelBar(60, 80, 200, 30, 0)
 start = BUTTON(20, 20)
 start_button = BUTTON(790, 440, 400, 170)
 
+#ambience
 sunny_bg = BUTTON(1200, 330, 50, 50)
 night_bg = BUTTON(1350, 330, 50, 50)
 snow_bg = BUTTON(1450, 330, 50, 50)
@@ -74,11 +77,19 @@ user_input = ""
 input_text = TEXT(user_input, 780,350,20, grey, grey,"DePixelHalbfett.ttf")
 add_task_text = TEXT("Todo list :", 1250, 525, 20, dark_grey, dark_grey,"DePixelHalbfett.ttf")
 add_task_button = BUTTON(screen_width-70, screen_height-80, 50, 50, black)
+checklist_1_button = BUTTON(1020, 570, 20, 20, grey)
+checklist_2_button = BUTTON(1020, 620, 20, 20, grey)
+checklist_3_button = BUTTON(1020, 670, 20, 20, grey)
 input_your_text = TEXT("Enter your task for today !", 800, 200, 30, blue, blue,"DePixelHalbfett.ttf")
 todo_lists = [""]
 todo1 = ""
-todo1_text = TEXT(todo1, 1250, 570, 18, grey, grey,"DePixelHalbfett.ttf")
+todo2 = ""
+todo3 = ""
+todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
+todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
+todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
 
+selected_background = 'Design/sunny.png'
 
 #screen functions
 def screen_startup():
@@ -106,7 +117,7 @@ def screen_home(selected_background):
     run = True
     while run:
 
-        global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length
+        global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,todo3
 
 
         for event in pygame.event.get():
@@ -154,7 +165,28 @@ def screen_home(selected_background):
                         current_seconds = current_seconds
                 #add to do list button
                 if add_task_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_user_input()
+                    #todo list cannot exceed 3 tasks
+                    if todo3 == "":
+                        screen_user_input()
+                #checked/finish our task
+                if checklist_1_button.check_for_input(pygame.mouse.get_pos()):
+                    todo_lists.remove(todo_lists[1])
+                    todo1_text.update_text(todo_lists[1])
+                    todo2_text.update_text(todo_lists[2])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
+                if checklist_2_button.check_for_input(pygame.mouse.get_pos()):
+                    todo_lists.remove(todo_lists[2])
+                    todo2_text.update_text(todo_lists[2])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
+                if checklist_3_button.check_for_input(pygame.mouse.get_pos()):
+                    todo_lists.remove(todo_lists[3])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
                 #settings button
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
@@ -219,6 +251,11 @@ def screen_home(selected_background):
         add_task_text.display_text()
         add_task_button.draw_button()
         todo1_text.display_text()
+        todo2_text.display_text()
+        todo3_text.display_text()
+        checklist_1_button.draw_button()
+        checklist_2_button.draw_button()
+        checklist_3_button.draw_button()
         
         if current_seconds >= 0:
             display_seconds = current_seconds % 60
@@ -233,7 +270,7 @@ def screen_home(selected_background):
         #draw level bar
         level_bar.draw(screen)
 
-        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, blackti)
+        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
         level_text.display_text()
 
         pygame.display.flip()
@@ -244,7 +281,7 @@ def screen_user_input():
     run = True
     while run:
 
-        global user_input,todo1
+        global user_input,todo1,todo2,todo3
         user_input_limit = 300
         user_input_length = input_text.check_text_length(user_input)
 
@@ -267,9 +304,27 @@ def screen_user_input():
                     user_input = user_input[:-1]
                 if event.key == pygame.K_RETURN:
                     todo_lists.append(user_input)
-                    todo1 = todo_lists[1]
-                    todo1_text.update_text(todo1)
-                    todo1_text.update_color(black)
+                    if len(todo_lists) >= 3+1:
+                        todo1 = todo_lists[1]
+                        todo2 = todo_lists[2]
+                        todo3 = todo_lists[3]
+                        todo1_text.update_text(todo1)
+                        todo2_text.update_text(todo2)
+                        todo3_text.update_text(todo3)
+                        checklist_1_button.update_color(black)
+                        checklist_2_button.update_color(black)
+                        checklist_3_button.update_color(black)
+                    elif len(todo_lists) == 2+1:
+                        todo1 = todo_lists[1]
+                        todo2 = todo_lists[2]
+                        todo1_text.update_text(todo1)
+                        todo2_text.update_text(todo2)
+                        checklist_1_button.update_color(black)
+                        checklist_2_button.update_color(black)
+                    else: 
+                        todo1 = todo_lists[1]
+                        todo1_text.update_text(todo1)
+                        checklist_1_button.update_color(black)
                     user_input = ""
                     input_text.update_text(user_input)
                     screen_home(selected_background)
@@ -341,12 +396,15 @@ def screen_settings():
                     print("Switching to homescreen")
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
+                    current_seconds = pomodoro_length
                     screen_home(selected_background)
                     print("Returning to homescreen")
 
         
         bg('Design/setting page.png')
         back.image_button('Design/back-button.png')
+        minute_text1.display_text()
+        minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
 
@@ -406,7 +464,6 @@ def screen_shop():
     show_fertilizer = False
     fertilizer_start_time = 0
     fertilizer_duration = 800  
-    background_image = pygame.image.load('Design/shop-page.png').convert()
 
     while run:
         
@@ -424,9 +481,8 @@ def screen_shop():
                     show_fertilizer = True
                     fertilizer_start_time = pygame.time.get_ticks()  # Record the start time
 
-        # Blit the background image
-        screen.blit(background_image, (0, 0))
-
+        # Display the background image
+        bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         if show_watering_can:
             current_time = pygame.time.get_ticks()
