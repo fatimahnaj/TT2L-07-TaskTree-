@@ -115,7 +115,7 @@ class Button():
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
 
-#Level Bar
+#Ummu Level Bar
 class LevelBar():
     def __init__(self, x, y, w, h, level):
         self.x = x
