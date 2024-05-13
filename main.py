@@ -20,7 +20,7 @@ pomodoro_length = 1800
 break_length = 300
 timer = 0
 
-lap_length = 3
+lap_length = 4
 current_lap = 1
 current_seconds = pomodoro_length
 pygame.time.set_timer(pygame.USEREVENT, 1000)
@@ -50,6 +50,17 @@ decrease_break = BUTTON(245, 510, 40, 20)
 point_per_second = 1/60
 level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
+
+#Coins 
+coins_per_task = 30
+coins_bar = Coins(0)
+coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+
+ambience_level_required = {
+    'sunny' : 0,
+    'night' : 1,
+    'snow' : 2,
+}
 
 start = BUTTON(20, 20)
 start_button = BUTTON(790, 440, 400, 170)
@@ -89,12 +100,33 @@ todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
 todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
 todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
 
+# background
 selected_background = 'Design/sunny.png'
+
+#internal function (ambience)
+def can_change_ambience(ambience):
+
+    level = level_bar.level  
+ 
+    if ambience in ambience_level_required:
+        # Compare the required level with your current level
+        required_level = ambience_level_required[ambience]
+        if level >= required_level:
+            print("You are eligible for", ambience, "ambience.")
+            return True
+        else:
+            print("You need to reach level", required_level, "to access", ambience, "ambience.")
+            return False
+    else:
+        print("Ambience not found in the requirements.")  
+        return False
+   
+
 
 #screen functions
 def screen_startup():
     run = True
-    selected_background = 'Design/sunny.png'
+
     while run:
         
         for event in pygame.event.get():
@@ -113,7 +145,9 @@ def screen_startup():
 
     pygame.quit()
 
-def screen_home(selected_background):
+def screen_home(new_selected_background):
+    global selected_background 
+    selected_background = new_selected_background
     run = True
     while run:
 
@@ -211,6 +245,10 @@ def screen_home(selected_background):
                                 if pomodoro:
                                     print("pomodoro completed")
                                     # level_bar.addXP(pomodoro_length * point_per_second)
+                                    coins_bar.addCoins(30)
+                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                                    coins_text.display_text()
+
                                     level_bar.addXP(20)
                                     level_bar.draw(screen)
                                     current_seconds = break_length
@@ -270,8 +308,16 @@ def screen_home(selected_background):
         #draw level bar
         level_bar.draw(screen)
 
-        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
+        level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
         level_text.display_text()
+
+        
+        #Coins
+        coins_image = BUTTON(10, 105)
+        coins_image.image_button('Design/coin.png')
+        
+        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+        coins_text.display_text()
 
         pygame.display.flip()
 
@@ -342,9 +388,6 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
-    global selected_background
-    selected_background = 'Design/sunny.png'
-
     run = True
     while run:
 
@@ -383,17 +426,30 @@ def screen_settings():
                         break_length = break_length
                 #ambience buttons
                 if sunny_bg.check_for_input(pygame.mouse.get_pos()):
-                    selected_background = 'Design/sunny.png'
-                    screen_home(selected_background)
-                    print("Switching to homescreen")
+                     
+                    res = can_change_ambience('sunny')
+
+                    if res == True:
+                        new_selected_background = 'Design/sunny.png'
+                        screen_home(new_selected_background)
+                        print("Switching to homescreen")
+                            
                 if night_bg.check_for_input(pygame.mouse.get_pos()):
-                    selected_background = 'Design/night.png'
-                    screen_home(selected_background)
-                    print("Switching to homescreen")
+                    res = can_change_ambience('night')
+
+                    if res == True:
+                        new_selected_background = 'Design/night.png'
+                        screen_home(new_selected_background)
+                        print("Switching to homescreen")
+
                 if snow_bg.check_for_input(pygame.mouse.get_pos()):
-                    selected_background = 'Design/snow.png'
-                    screen_home(selected_background)
-                    print("Switching to homescreen")
+                    res = can_change_ambience('snow')
+
+                    if res == True:
+                        new_selected_background = 'Design/snow.png'
+                        screen_home(new_selected_background)
+                        print("Switching to homescreen")
+
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
@@ -407,6 +463,27 @@ def screen_settings():
         minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
+
+        if can_change_ambience('sunny'):
+            sunny_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            sunny_bg.image_button('Design/lock.png')
+             # false, locked
+
+        if can_change_ambience('night'):
+            night_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            night_bg.image_button('Design/lock.png')
+             # false, locked
+        
+        if can_change_ambience('snow'):
+            snow_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            snow_bg.image_button('Design/lock.png')
+             # false, locked
 
         pygame.display.flip()
 
