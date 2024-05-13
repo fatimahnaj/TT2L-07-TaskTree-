@@ -49,6 +49,11 @@ point_per_second = 1/60
 level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
 
+#Coins 
+coins_per_task = 30
+coins_bar = Coins(0)
+coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+
 ambience_level_required = {
     'sunny' : 0,
     'night' : 1,
@@ -209,6 +214,10 @@ def screen_home(new_selected_background):
                                 if pomodoro:
                                     print("pomodoro completed")
                                     # level_bar.addXP(pomodoro_length * point_per_second)
+                                    coins_bar.addCoins(30)
+                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                                    coins_text.display_text()
+
                                     level_bar.addXP(20)
                                     level_bar.draw(screen)
                                     current_seconds = break_length
@@ -263,8 +272,16 @@ def screen_home(new_selected_background):
         #draw level bar
         level_bar.draw(screen)
 
-        level_text = TEXT("Level " + str(level_bar.level), 110, 50, 50, black)
+        level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
         level_text.display_text()
+
+        
+        #Coins
+        coins_image = BUTTON(10, 105)
+        coins_image.image_button('Design/coin.png')
+        
+        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+        coins_text.display_text()
 
         pygame.display.flip()
 

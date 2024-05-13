@@ -140,5 +140,18 @@ class LevelBar():
             self.level += 1
             self.xp = 0 + excess
 
+    
+class Coins():
+    def __init__(self, coins):
+        self.coins = coins
+    
+    def addCoins(self, increment):
+        self.coins +=increment
+        
+
+        
+    
+
+
 
 
