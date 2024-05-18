@@ -148,10 +148,3 @@ class Coins():
     def addCoins(self, increment):
         self.coins +=increment
         
-
-        
-    
-
-
-
-
