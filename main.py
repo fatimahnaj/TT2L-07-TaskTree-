@@ -85,6 +85,10 @@ shop_back = BUTTON(345, 300, 100,80)
 water_plant = BUTTON(120, 400, 120, 50)
 fertilizer = BUTTON(120, 570, 120, 50)
 
+#music
+music_1 = BUTTON(600, 300, 80, 70)
+music_2 = BUTTON(700, 300, 80, 70)
+music_3 = BUTTON(800, 300, 80, 70)
 
 #user input for todo list
 user_input = ""
@@ -583,7 +587,7 @@ def screen_shop():
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
                     fertilize.trigger()  # Record the start time
 
-        # Display the background image
+        bg('design/plant1.png')
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         watering_can.show()
