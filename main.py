@@ -133,6 +133,7 @@ def finish_task_2(button):
 def save_game_state():
     game_state = {
         'level': level_bar.level,
+        'level_xp': level_bar.xp,
         'coins': coins_bar.coins,
         'todo_lists': todo_lists,
         'todo1': todo1,
@@ -149,6 +150,7 @@ def load_game_state():
         with open('game_state.txt', 'r') as f:
             game_state = json.load(f)
             level_bar.level = game_state['level']
+            level_bar.xp = game_state['level_xp']
             coins_bar.coins = game_state['coins']
             todo_lists = game_state['todo_lists']
             todo1 = game_state['todo1']
@@ -171,6 +173,7 @@ def load_game_state():
     else:
         # Initialize game state to default values
         level_bar.level = 1
+        level_bar.xp = 0
         coins_bar.coins = 0
         todo_lists = [""]
         todo1 = ""
