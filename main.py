@@ -1,4 +1,6 @@
 import pygame
+import json
+import os
 from classes_functions import *
 
 pygame.init()
@@ -20,8 +22,10 @@ dark_grey = (94,99,122)
 blue = (39, 39, 89)
 
 #in seconds
-pomodoro_length = 1800
-break_length = 300
+#pomodoro_length = 1800
+#break_length = 300
+pomodoro_length = 1
+break_length = 3
 timer = 0
 
 lap_length = 4
@@ -123,6 +127,44 @@ def finish_task_2(button):
         todo2_text.update_text(todo2)
     checklist_2_button.update_color(grey)
 
+#save & load data
+def save_game_state():
+    game_state = {
+        'level': level_bar.level,
+        'coins': coins_bar.coins,
+        'todo_lists': todo_lists,
+        'todo1': todo1,
+        'todo2': todo2,
+        'todo3': todo3,
+        
+    }
+    with open('game_state.txt', 'w') as f:
+        json.dump(game_state, f)
+
+def load_game_state():
+    global level_bar, coins_bar, todo_lists, todo1, todo2, todo3
+    if os.path.exists('game_state.txt'):
+        with open('game_state.txt', 'r') as f:
+            game_state = json.load(f)
+            level_bar.level = game_state['level']
+            coins_bar.coins = game_state['coins']
+            todo_lists = game_state['todo_lists']
+            todo1 = game_state['todo1']
+            todo2 = game_state['todo2']
+            todo3 = game_state['todo3']
+
+        todo1_text.update_text(todo1)
+        todo2_text.update_text(todo2)
+        todo3_text.update_text(todo3)
+    else:
+        # Initialize game state to default values
+        level_bar.level = 1
+        coins_bar.coins = 0
+        todo_lists = [""]
+        todo1 = ""
+        todo2 = ""
+        todo3 = ""
+
 # background
 selected_background = 'Design/sunny.png'
 
@@ -172,6 +214,8 @@ def growth_plant():
 #screen functions
 def screen_startup():
     run = True
+
+    load_game_state()
 
     while run:
         
@@ -303,6 +347,9 @@ def screen_home(new_selected_background):
                                     level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro = False
+                                    save_game_state()
+
+                                
                                 else:
                                     current_seconds = pomodoro_length
                                     pomodoro = True
@@ -319,6 +366,8 @@ def screen_home(new_selected_background):
                                     level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro = False
+                                    save_game_state()
+                                   
                                 else:
                                     current_seconds = pomodoro_length
                                     pomodoro = True
@@ -425,6 +474,7 @@ def screen_user_input():
                         todo1 = todo_lists[1]
                         todo1_text.update_text(todo1)
                         checklist_1_button.update_color(blue)
+                    save_game_state()
                     user_input = ""
                     input_text.update_text(user_input)
                     screen_home(selected_background)
