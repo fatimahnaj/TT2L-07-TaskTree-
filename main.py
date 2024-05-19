@@ -9,6 +9,9 @@ screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
 
+clock = pygame.time.Clock()
+clock.tick(60)  # Limit frame rate to 60 FPS
+
 #colors
 black = (0,0,0)
 grey = (231,231,245)
@@ -533,13 +536,8 @@ def screen_garden() :
 
 def screen_shop():
     run = True
-    clock = pygame.time.Clock()
-    show_watering_can = False
-    watering_can_start_time = 0
-    watering_can_duration = 800  
-    show_fertilizer = False
-    fertilizer_start_time = 0
-    fertilizer_duration = 800  
+    watering_can = POPUP('Design/watering-can.png',800)
+    fertilize = POPUP('Design/fertilizer.png',800)
 
     while run:
         
@@ -551,42 +549,18 @@ def screen_shop():
                     screen_plant()
                     print("Returning to plant screen")
                 if water_plant.check_for_input(pygame.mouse.get_pos()):
-                    show_watering_can = True
-                    watering_can_start_time = pygame.time.get_ticks()  # Record the start time
+                    watering_can.trigger() # Record the start time
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
-                    show_fertilizer = True
-                    fertilizer_start_time = pygame.time.get_ticks()  # Record the start time
+                    fertilize.trigger()  # Record the start time
 
         # Display the background image
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
-        if show_watering_can:
-            current_time = pygame.time.get_ticks()
-            if current_time - watering_can_start_time < watering_can_duration:
-                # Load the watering can image
-                watering_can_image = pygame.image.load('Design/watering-can.png').convert_alpha()
-                # Calculate its position to center it on the screen
-                watering_can_rect = watering_can_image.get_rect(center=(screen_width / 2, screen_height / 2))
-                # Blit the watering can image
-                screen.blit(watering_can_image, watering_can_rect)
-            else:
-                show_watering_can = False
-                
-        if show_fertilizer:
-            current_time = pygame.time.get_ticks()
-            if current_time - fertilizer_start_time < fertilizer_duration:
-                # Load the watering can image
-                fertilizer_image = pygame.image.load('Design/fertilizer.png').convert_alpha()
-                # Calculate its position to center it on the screen
-                fertilizer_rect = fertilizer_image.get_rect(center=(screen_width / 2, screen_height / 2))
-                # Blit the watering can image
-                screen.blit(fertilizer_image, fertilizer_rect)
-            else:
-                show_fertilizer = False
+        watering_can.show()
+        fertilize.show()
 
 
         pygame.display.flip()
-        clock.tick(60)  # Limit frame rate to 60 FPS
 
     pygame.quit()
 
