@@ -2,6 +2,7 @@ import pygame
 from classes_functions import *
 
 pygame.init()
+pygame.mixer.init()
 
 screen_size = (1540,800)
 screen_width = screen_size[0]
@@ -70,6 +71,11 @@ shop = BUTTON(0, 0)
 shop_button = BUTTON(60, 290, 100, 80)
 shop_back = BUTTON(345, 300, 100,80)
 
+#music
+music_1 = BUTTON(670, 450, 60, 60)
+music_2 = BUTTON(770, 450, 60, 60)
+music_3 = BUTTON(870, 450, 60, 60)
+
 #user input for todo list
 user_input = ""
 input_text = TEXT(user_input, 780,350,20, grey, grey,"DePixelHalbfett.ttf")
@@ -137,8 +143,31 @@ def can_change_ambience(ambience):
     else:
         print("Ambience not found in the requirements.")  
         return False
-   
+    
+#plant growth 
+plant_stage = 1
+water_count = 0
+fertilizer_count = 0
+water_required = 2
+fertilizer_required = 2
+selected_plant_background = 'Design/plant1.png'
 
+def growth_plant():
+    global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
+
+    plant_stage += 1
+    water_count = 0
+    fertilizer_count = 0
+    water_required += 2
+    fertilizer_required += 2
+
+    #update plant image
+    if plant_stage == 2:
+        selected_plant_background = 'Design/plant2.png'
+    elif plant_stage == 3:
+        selected_plant_background = 'Design/plant3.png' 
+    elif plant_stage == 4:
+        selected_plant_background = 'Design/plant4.png'
 
 #screen functions
 def screen_startup():
@@ -482,6 +511,13 @@ def screen_settings():
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
 
+                if music_1.check_for_input(pygame.mouse.get_pos()):
+                    play_music('Songs/music_1.MP3')
+                if music_2.check_for_input(pygame.mouse.get_pos()):
+                    play_music('Songs/music_2.MP3')
+                if music_3.check_for_input(pygame.mouse.get_pos()):
+                    play_music('Songs/music_3.MP3')
+
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
@@ -537,7 +573,7 @@ def screen_plant() :
                     screen_shop()
                     print("Switching to shop screen.")
 
-        bg('Design/plant1.png')
+        bg(selected_plant_background)
         back.image_button('Design/back-button.png')
         shop.image_button('Design/shop-button.png')
 
@@ -565,6 +601,7 @@ def screen_garden() :
     pygame.quit()
 
 def screen_shop():
+    global water_count, fertilizer_count, water_required, fertilizer_required
     run = True
     water_plant = BUTTON(120, 400, 120, 50)
     fertilizer = BUTTON(120, 570, 120, 50)
@@ -581,12 +618,17 @@ def screen_shop():
                     screen_plant()
                     print("Returning to plant screen")
                 if water_plant.check_for_input(pygame.mouse.get_pos()):
+                    water_count += 1
                     watering_can.trigger() # Record the start time
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
+                    fertilizer_count += 1
                     fertilize.trigger()  # Record the start time
+                
+                #check if plant should grow
+                if water_count >= water_required and fertilizer_count >= fertilizer_required:
+                    growth_plant()
 
-        # Display the background image
-        bg('Design/plant1.png')
+        bg(selected_plant_background)
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         watering_can.show()
@@ -597,4 +639,5 @@ def screen_shop():
 
     pygame.quit()
 
-screen_startup()
+
+screen_startup() 
