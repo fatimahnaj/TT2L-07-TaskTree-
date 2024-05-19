@@ -2,6 +2,8 @@ import pygame
 pygame.init()
 
 screen_size = (1540,800)
+screen_width = screen_size[0]
+screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 
 black = (0,0,0)
@@ -148,3 +150,26 @@ class Coins():
     def addCoins(self, increment):
         self.coins +=increment
         
+class POPUP:
+    def __init__(self,image,max_duration):
+        self.show_popup = False
+        self.start_time = 0
+        self.max_duration = max_duration  
+        self.image = image
+
+    def trigger(self):
+        self.show_popup = True
+        self.start_time = pygame.time.get_ticks()
+
+    def show(self):
+        if self.show_popup:
+                current_time = pygame.time.get_ticks()
+                if current_time - self.start_time < self.max_duration:
+                    # Load the image
+                    image = pygame.image.load(self.image).convert_alpha()
+                    # Calculate its position to center it on the screen
+                    rect = image.get_rect(center=(screen_width / 2, screen_height / 2))
+                    # Blit the image
+                    screen.blit(image, rect)
+                else:
+                    self.show_popup = False
