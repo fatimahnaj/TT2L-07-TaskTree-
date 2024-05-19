@@ -165,11 +165,11 @@ class POPUP:
         if self.show_popup:
                 current_time = pygame.time.get_ticks()
                 if current_time - self.start_time < self.max_duration:
-                    # Load the watering can image
+                    # Load the image
                     image = pygame.image.load(self.image).convert_alpha()
                     # Calculate its position to center it on the screen
                     rect = image.get_rect(center=(screen_width / 2, screen_height / 2))
-                    # Blit the watering can image
+                    # Blit the image
                     screen.blit(image, rect)
                 else:
                     self.show_popup = False
