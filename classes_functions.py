@@ -61,7 +61,7 @@ class BUTTON:
         self.circle_width = circle_width
 
     def draw_button(self):
-        set_button = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        set_button = pygame.Rect(self.x, self.y, self.width, self.height)
         pygame.draw.rect(screen, self.color, set_button)
 
     def draw_circle(self):
@@ -69,7 +69,7 @@ class BUTTON:
         pygame.draw.circle(screen, self.color, circle_center, 10, self.circle_width)
 
     def fill_circle(self,position):
-        rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        rect = pygame.Rect(self.x, self.y, self.width, self.height)
         if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             self.circle_width = 0
         else:
@@ -78,7 +78,9 @@ class BUTTON:
     
     def image_button(self,image_link):
         image = pygame.image.load(image_link)
-        screen.blit(image, (self.x, self.y))
+        rect_2 = image.get_rect()
+        rect_2.topleft = (self.x, self.y)
+        screen.blit(image, rect_2)
 
     def update_color(self, new_color):
         self.color = new_color
