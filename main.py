@@ -169,6 +169,7 @@ def growth_plant():
     elif plant_stage == 4:
         selected_plant_background = 'Design/plant4.png'
 
+
 #screen functions
 def screen_startup():
     run = True
@@ -558,6 +559,8 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
+    global plant_stage
+    transfer_to_garden_button = BUTTON(900,550, 100,91, blue)
     run = True
     while run:
 
@@ -572,10 +575,15 @@ def screen_plant() :
                 if shop_button.check_for_input(pygame.mouse.get_pos()):
                     screen_shop()
                     print("Switching to shop screen.")
+                if transfer_to_garden_button.check_for_input(pygame.mouse.get_pos()):
+                    screen_garden()
+                    print("Switching to garden screen.")
 
         bg(selected_plant_background)
         back.image_button('Design/back-button.png')
         shop.image_button('Design/shop-button.png')
+        if plant_stage == 4:
+            transfer_to_garden_button.image_button('Design/next_arrow.png')
 
         pygame.display.flip()
 
@@ -583,6 +591,10 @@ def screen_plant() :
 
 def screen_garden() :
     run = True
+    dragging = False
+    planted_flowers = 50
+    flower = pygame.image.load('Design/flower_draft.png')
+    flower_rect = flower.get_rect()
     while run:
 
         for event in pygame.event.get():
@@ -592,10 +604,52 @@ def screen_garden() :
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     screen_home(selected_background)
                     print("Returning to homescreen")
+                if flower_rect.collidepoint(event.pos):
+                        dragging = True
+            elif event.type == pygame.MOUSEBUTTONUP:
+                dragging = False
+            elif event.type == pygame.MOUSEMOTION:
+                if dragging:
+                    mouse_x, mouse_y = event.pos
+                    flower_rect.x = mouse_x - 20
+                    flower_rect.y = mouse_y - 18
+                    print(f"Cursor position = ({mouse_x},{mouse_y})")
+                    print(f"Image location = ({flower_rect.x},{flower_rect.y})")
 
-        bg('Design/garden.png')
+        if planted_flowers <= 10:
+            zoom_level = 3.0
+        elif planted_flowers <= 30:
+            zoom_level = 2.6
+        elif planted_flowers <= 60:
+            zoom_level = 2.2
+        elif planted_flowers <= 80:
+            zoom_level = 1.8
+        elif planted_flowers <= 100:
+            zoom_level = 1.4
+        elif planted_flowers <= 130:
+            zoom_level = 1.0
+
+        screen.fill((228, 255, 209)) # Fill the screen with green color
+        bg = pygame.image.load('Design/garden_draft.jpg')
         back.image_button('Design/back-button.png')
 
+        main_surface = pygame.Surface((1540,800)) #crop/frame n make it center
+        main_surface.blit(bg, (0,0))
+        new_width = int(main_surface.get_width() * zoom_level)
+        new_height = int(main_surface.get_height() * zoom_level)
+        zoomed_main_surface = pygame.transform.smoothscale(main_surface, (new_width, new_height))
+
+        # Center the main surface on the screen
+        screen_rect = screen.get_rect()
+        zoomed_main_surface_rect = zoomed_main_surface.get_rect(center=screen_rect.center)
+
+        # Blit the scaled main surface to the screen
+        screen.blit(zoomed_main_surface, zoomed_main_surface_rect.topleft)
+
+        # Draw the image at its new position
+        screen.blit(flower, flower_rect.topleft)
+
+        # Update the display
         pygame.display.flip()
 
     pygame.quit()
