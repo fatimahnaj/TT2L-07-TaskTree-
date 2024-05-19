@@ -52,7 +52,7 @@ decrease_break = BUTTON(245, 510, 40, 20)
 #Level Points
 point_per_second = 1/60
 level_xp_increment = 10
-level_bar = LevelBar(60, 80, 200, 30, 0)
+level_bar = LevelBar(60, 80, 200, 30, 1)
 
 #Coins 
 coins_per_task = 30
@@ -102,6 +102,36 @@ todo3 = ""
 todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
 todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
 todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
+
+def finish_task_3(button):
+    if button == 1:
+        todo_lists.remove(todo_lists[1])
+        todo1_text.update_text(todo_lists[1])
+        todo2_text.update_text(todo_lists[2])
+        todo3 = ""
+        todo3_text.update_text(todo3)
+    elif button == 2:
+        todo_lists.remove(todo_lists[2])
+        todo2_text.update_text(todo_lists[2])
+        todo3 = ""
+        todo3_text.update_text(todo3)
+    elif button == 3:
+        todo_lists.remove(todo_lists[3])
+        todo3 = ""
+        todo3_text.update_text(todo3)
+    checklist_3_button.update_color(grey)
+
+def finish_task_2(button):
+    if button == 1:
+        todo_lists.remove(todo_lists[1])
+        todo1_text.update_text(todo_lists[1])
+        todo2 = ""
+        todo2_text.update_text(todo2)
+    elif button == 2:
+        todo_lists.remove(todo_lists[2])
+        todo2 = ""
+        todo2_text.update_text(todo2)
+    checklist_2_button.update_color(grey)
 
 # background
 selected_background = 'Design/sunny.png'
@@ -202,27 +232,27 @@ def screen_home(new_selected_background):
                 #add to do list button
                 if add_task_button.check_for_input(pygame.mouse.get_pos()):
                     #todo list cannot exceed 3 tasks
-                    if todo3 == "":
+                    if len(todo_lists) < 4:
                         screen_user_input()
                 #checked/finish our task
                 if checklist_1_button.check_for_input(pygame.mouse.get_pos()):
-                    todo_lists.remove(todo_lists[1])
-                    todo1_text.update_text(todo_lists[1])
-                    todo2_text.update_text(todo_lists[2])
-                    todo3 = ""
-                    todo3_text.update_text(todo3)
-                    checklist_3_button.update_color(grey)
+                    if len(todo_lists) == 3+1:
+                        finish_task_3(1)
+                    elif len(todo_lists) == 2+1:
+                        finish_task_2(1)
+                    elif len(todo_lists) == 1+1:
+                        todo_lists.remove(todo_lists[1])
+                        todo1 = ""
+                        todo1_text.update_text(todo1)
+                        checklist_1_button.update_color(grey)
                 if checklist_2_button.check_for_input(pygame.mouse.get_pos()):
-                    todo_lists.remove(todo_lists[2])
-                    todo2_text.update_text(todo_lists[2])
-                    todo3 = ""
-                    todo3_text.update_text(todo3)
-                    checklist_3_button.update_color(grey)
+                    if len(todo_lists) == 3+1:
+                        finish_task_3(2)
+                    elif len(todo_lists) == 2+1:
+                        finish_task_2(2)
                 if checklist_3_button.check_for_input(pygame.mouse.get_pos()):
-                    todo_lists.remove(todo_lists[3])
-                    todo3 = ""
-                    todo3_text.update_text(todo3)
-                    checklist_3_button.update_color(grey)
+                    if len(todo_lists) == 3+1:
+                        finish_task_3(3)
                 #settings button
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
