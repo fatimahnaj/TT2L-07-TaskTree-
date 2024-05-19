@@ -87,12 +87,9 @@ water_plant = BUTTON(120, 400, 120, 50)
 fertilizer = BUTTON(120, 570, 120, 50)
 
 #music
-music_1 = BUTTON(600, 300, 80, 70)
-music_2 = BUTTON(700, 300, 80, 70)
-music_3 = BUTTON(800, 300, 80, 70)
-
-#load music
-pygame.mixer.music.load()
+music_1 = BUTTON(670, 450, 60, 60)
+music_2 = BUTTON(770, 450, 60, 60)
+music_3 = BUTTON(870, 450, 60, 60)
 
 #user input for todo list
 user_input = ""
@@ -489,6 +486,19 @@ def screen_settings():
                         new_selected_background = 'Design/snow.png'
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
+
+                if music_1.check_for_input(pygame.mouse.get_pos()):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Songs/music_1.MP3')
+                    pygame.mixer.music.play(-1)
+                if music_2.check_for_input(pygame.mouse.get_pos()):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Songs/music_2.MP3')
+                    pygame.mixer.music.play(-1)
+                if music_3.check_for_input(pygame.mouse.get_pos()):
+                    pygame.mixer.music.stop()
+                    pygame.mixer.music.load('Songs/music_3.MP3')
+                    pygame.mixer.music.play(-1)
 
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
