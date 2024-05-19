@@ -114,6 +114,7 @@ def finish_task_3(button):
         todo3 = ""
         todo3_text.update_text(todo3)
     checklist_3_button.update_color(grey)
+    save_game_state()
 
 def finish_task_2(button):
     if button == 1:
@@ -126,6 +127,7 @@ def finish_task_2(button):
         todo2 = ""
         todo2_text.update_text(todo2)
     checklist_2_button.update_color(grey)
+    save_game_state()   
 
 #save & load data
 def save_game_state():
@@ -156,6 +158,16 @@ def load_game_state():
         todo1_text.update_text(todo1)
         todo2_text.update_text(todo2)
         todo3_text.update_text(todo3)
+
+        if len(todo_lists) == 3+1:
+            checklist_1_button.update_color(blue)
+            checklist_2_button.update_color(blue)
+            checklist_3_button.update_color(blue)
+        elif len(todo_lists) == 2+1:
+            checklist_1_button.update_color(blue)
+            checklist_2_button.update_color(blue)
+        elif len(todo_lists) == 1+1:
+            checklist_1_button.update_color(blue)
     else:
         # Initialize game state to default values
         level_bar.level = 1
