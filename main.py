@@ -2,6 +2,7 @@ import pygame
 from classes_functions import *
 
 pygame.init()
+pygame.mixer.init()
 
 screen_size = (1540,800)
 screen_width = screen_size[0]
@@ -89,6 +90,9 @@ fertilizer = BUTTON(120, 570, 120, 50)
 music_1 = BUTTON(600, 300, 80, 70)
 music_2 = BUTTON(700, 300, 80, 70)
 music_3 = BUTTON(800, 300, 80, 70)
+
+#load music
+pygame.mixer.music.load()
 
 #user input for todo list
 user_input = ""
