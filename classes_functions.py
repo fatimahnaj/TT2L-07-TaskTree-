@@ -50,7 +50,7 @@ class TEXT:
     
 #fatim punya button
 class BUTTON:
-    def __init__(self, x, y, width=0, height=0, color=black):
+    def __init__(self, x, y, width=0, height=0, color=black, circle_width=3):
         self.x = x
         self.y = y
         self.width = width
@@ -58,11 +58,24 @@ class BUTTON:
         self.color = color
         self.center_x = self.x - self.width // 2
         self.center_y = self.y - self.height // 2
+        self.circle_width = circle_width
 
     def draw_button(self):
         set_button = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
         pygame.draw.rect(screen, self.color, set_button)
 
+    def draw_circle(self):
+        circle_center = (self.x,self.y)
+        pygame.draw.circle(screen, self.color, circle_center, 10, self.circle_width)
+
+    def fill_circle(self,position):
+        rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
+            self.circle_width = 0
+        else:
+            self.circle_width = 3
+
+    
     def image_button(self,image_link):
         image = pygame.image.load(image_link)
         screen.blit(image, (self.x, self.y))
