@@ -49,7 +49,7 @@ decrease_break = BUTTON(245, 510, 40, 20)
 #Level Points
 point_per_second = 1/60
 level_xp_increment = 10
-level_bar = LevelBar(60, 80, 200, 30, 1)
+level_bar = LevelBar(60, 80, 200, 30, 0)
 
 #Coins 
 coins_per_task = 30
@@ -99,36 +99,6 @@ todo3 = ""
 todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
 todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
 todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
-
-def finish_task_3(button):
-    if button == 1:
-        todo_lists.remove(todo_lists[1])
-        todo1_text.update_text(todo_lists[1])
-        todo2_text.update_text(todo_lists[2])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    elif button == 2:
-        todo_lists.remove(todo_lists[2])
-        todo2_text.update_text(todo_lists[2])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    elif button == 3:
-        todo_lists.remove(todo_lists[3])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    checklist_3_button.update_color(grey)
-
-def finish_task_2(button):
-    if button == 1:
-        todo_lists.remove(todo_lists[1])
-        todo1_text.update_text(todo_lists[1])
-        todo2 = ""
-        todo2_text.update_text(todo2)
-    elif button == 2:
-        todo_lists.remove(todo_lists[2])
-        todo2 = ""
-        todo2_text.update_text(todo2)
-    checklist_2_button.update_color(grey)
 
 # background
 selected_background = 'Design/sunny.png'
@@ -229,27 +199,27 @@ def screen_home(new_selected_background):
                 #add to do list button
                 if add_task_button.check_for_input(pygame.mouse.get_pos()):
                     #todo list cannot exceed 3 tasks
-                    if len(todo_lists) < 4:
+                    if todo3 == "":
                         screen_user_input()
                 #checked/finish our task
                 if checklist_1_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(1)
-                    elif len(todo_lists) == 2+1:
-                        finish_task_2(1)
-                    elif len(todo_lists) == 1+1:
-                        todo_lists.remove(todo_lists[1])
-                        todo1 = ""
-                        todo1_text.update_text(todo1)
-                        checklist_1_button.update_color(grey)
+                    todo_lists.remove(todo_lists[1])
+                    todo1_text.update_text(todo_lists[1])
+                    todo2_text.update_text(todo_lists[2])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
                 if checklist_2_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(2)
-                    elif len(todo_lists) == 2+1:
-                        finish_task_2(2)
+                    todo_lists.remove(todo_lists[2])
+                    todo2_text.update_text(todo_lists[2])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
                 if checklist_3_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(3)
+                    todo_lists.remove(todo_lists[3])
+                    todo3 = ""
+                    todo3_text.update_text(todo3)
+                    checklist_3_button.update_color(grey)
                 #settings button
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
@@ -582,39 +552,41 @@ def screen_shop():
                     print("Returning to plant screen")
                 if water_plant.check_for_input(pygame.mouse.get_pos()):
                     show_watering_can = True
-                    watering_can_start_time = pygame.time.get_ticks()  # Record the start time
+                    watering_can_start_time = pygame.time.get_ticks()  # Reset start time to current time
+                    print("Watering can button clicked")
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
                     show_fertilizer = True
-                    fertilizer_start_time = pygame.time.get_ticks()  # Record the start time
+                    fertilizer_start_time = pygame.time.get_ticks()  # Reset start time to current time
+                    print("Fertilizer button clicked")
 
-        # Display the background image
+        # Blit the background image
         bg('Design/shop-page.png')
-        # Check if we need to show the watering can image
+
+        current_time = pygame.time.get_ticks()
+        print(f"Current time: {current_time}")
+
+        # Blit other images on top of the background
         if show_watering_can:
-            current_time = pygame.time.get_ticks()
             if current_time - watering_can_start_time < watering_can_duration:
-                # Load the watering can image
+                print("Displaying watering can")
                 watering_can_image = pygame.image.load('Design/watering-can.png').convert_alpha()
-                # Calculate its position to center it on the screen
                 watering_can_rect = watering_can_image.get_rect(center=(screen_width / 2, screen_height / 2))
-                # Blit the watering can image
                 screen.blit(watering_can_image, watering_can_rect)
             else:
                 show_watering_can = False
-                
+                print("Hiding watering can")
+        
         if show_fertilizer:
-            current_time = pygame.time.get_ticks()
             if current_time - fertilizer_start_time < fertilizer_duration:
-                # Load the watering can image
+                print("Displaying fertilizer")
                 fertilizer_image = pygame.image.load('Design/fertilizer.png').convert_alpha()
-                # Calculate its position to center it on the screen
                 fertilizer_rect = fertilizer_image.get_rect(center=(screen_width / 2, screen_height / 2))
-                # Blit the watering can image
                 screen.blit(fertilizer_image, fertilizer_rect)
             else:
                 show_fertilizer = False
+                print("Hiding fertilizer")
 
-
+        # Update the display
         pygame.display.flip()
         clock.tick(60)  # Limit frame rate to 60 FPS
 
