@@ -141,3 +141,9 @@ class POPUP:
                     screen.blit(image, rect)
                 else:
                     self.show_popup = False
+
+#anisah sounds
+def play_music(music_file):
+    pygame.mixer.music.stop()
+    pygame.mixer.music.load(music_file)
+    pygame.mixer.music.play(-1)
