@@ -3,3 +3,4 @@ __pycache__/
 *.pyo
 
 /game_state.txt
+/DS_Store
