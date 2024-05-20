@@ -2,6 +2,7 @@ import pygame
 import json
 import os
 from classes_functions import *
+from pygame.locals import *
 
 pygame.init()
 pygame.mixer.init()
@@ -80,6 +81,21 @@ music_1 = BUTTON(670, 450, 60, 60)
 music_2 = BUTTON(770, 450, 60, 60)
 music_3 = BUTTON(870, 450, 60, 60)
 
+play_music('Songs/music_1.MP3')
+
+#sounds
+mute = BUTTON(824,407, 90, 60)
+unmute = BUTTON(1000, 200, 60, 60)
+
+#plant growth 
+plant_stage = 1
+water_count = 0
+fertilizer_count = 0
+water_required = 2
+fertilizer_required = 2
+selected_plant_background = 'Design/plant1.png'
+
+
 #user input for todo list
 user_input = ""
 input_text = TEXT(user_input, 780,350,20, grey, grey,"DePixelHalbfett.ttf")
@@ -143,23 +159,29 @@ def save_game_state():
         'todo1': todo1,
         'todo2': todo2,
         'todo3': todo3,
+        'plant_stage': plant_stage,
+        'water_count': water_count,
+        'fertilizer_count': fertilizer_count
         
     }
     with open('game_state.txt', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, todo_lists, todo1, todo2, todo3
+    global level_bar, coins_bar, todo_lists, todo1, todo2, todo3, plant_stage, water_count, fertilizer_count, selected_plant_background
     if os.path.exists('game_state.txt'):
         with open('game_state.txt', 'r') as f:
             game_state = json.load(f)
-            level_bar.level = game_state['level']
-            level_bar.xp = game_state['level_xp']
-            coins_bar.coins = game_state['coins']
-            todo_lists = game_state['todo_lists']
-            todo1 = game_state['todo1']
-            todo2 = game_state['todo2']
-            todo3 = game_state['todo3']
+            level_bar.level = game_state.get('level', 0)
+            level_bar.xp = game_state.get('level_xp', 0)
+            coins_bar.coins = game_state.get('coins', 0)
+            todo_lists = game_state.get('todo_lists', [""])
+            todo1 = game_state.get('todo1', "")
+            todo2 = game_state.get('todo2', "")
+            todo3 = game_state.get('todo3', "")
+            plant_stage = game_state.get('plant_stage', 1)
+            water_count = game_state.get('water_count', 0)
+            fertilizer_count = game_state.get('fertilizer_count', 0)
 
         todo1_text.update_text(todo1)
         todo2_text.update_text(todo2)
@@ -174,18 +196,25 @@ def load_game_state():
             checklist_2_button.update_color(blue)
         elif len(todo_lists) == 1+1:
             checklist_1_button.update_color(blue)
+
+        
     else:
         # Initialize game state to default values
-        level_bar.level = 1
+        level_bar.level = 0
         level_bar.xp = 0
         coins_bar.coins = 0
         todo_lists = [""]
         todo1 = ""
         todo2 = ""
         todo3 = ""
+        plant_stage = 1
+        water_count = 0
+        fertilizer_count = 0
 
 # background
 selected_background = 'Design/sunny.png'
+
+
 
 #internal function (ambience)
 def can_change_ambience(ambience):
@@ -204,14 +233,18 @@ def can_change_ambience(ambience):
     else:
         print("Ambience not found in the requirements.")  
         return False
+
+#internal function (coins)
+def spend_coins(cost):
+    if coins_bar.coins >= cost:
+        coins_bar.coins -= cost
+        print("You have spent", cost, "coins.")
+        return True
+    else:
+        print("You do not have enough coins to spend.")
+        return False
     
-#plant growth 
-plant_stage = 1
-water_count = 0
-fertilizer_count = 0
-water_required = 2
-fertilizer_required = 2
-selected_plant_background = 'Design/plant1.png'
+
 
 def growth_plant():
     global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
@@ -221,15 +254,6 @@ def growth_plant():
     fertilizer_count = 0
     water_required += 2
     fertilizer_required += 2
-
-    #update plant image
-    if plant_stage == 2:
-        selected_plant_background = 'Design/plant2.png'
-    elif plant_stage == 3:
-        selected_plant_background = 'Design/plant3.png' 
-    elif plant_stage == 4:
-        selected_plant_background = 'Design/plant4.png'
-
 
 #screen functions
 def screen_startup():
@@ -394,6 +418,15 @@ def screen_home(new_selected_background):
                                     started = False
                                     start_stop_button.update_text("START")
                                     print("finish lap")
+            #mute/unmute
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
+        
+                
 
         bg(selected_background)
         settings.image_button('Design/setting-button1.png')
@@ -520,6 +553,8 @@ def screen_settings():
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
 
+    
+
     while run:
 
         global pomodoro_length,break_length,lap_length,current_seconds
@@ -588,6 +623,9 @@ def screen_settings():
                 if music_3.check_for_input(pygame.mouse.get_pos()):
                     play_music('Songs/music_3.MP3')
 
+                if mute.check_for_input(pygame.mouse.get_pos()):
+                    print("Mute")
+
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
@@ -601,6 +639,8 @@ def screen_settings():
         minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
+
+ 
 
         if can_change_ambience('sunny'):
             sunny_bg.image_button('Design/nothing.png')
@@ -648,9 +688,25 @@ def screen_plant() :
                     screen_garden()
                     print("Switching to garden screen.")
 
+        global selected_plant_background
+        #update plant image
+        if plant_stage == 2:
+            selected_plant_background = 'Design/plant2.png'
+        elif plant_stage == 3:
+            selected_plant_background = 'Design/plant3.png' 
+        elif plant_stage == 4:
+            selected_plant_background = 'Design/plant4.png'
         bg(selected_plant_background)
         back.image_button('Design/back-button.png')
         shop.image_button('Design/shop-button.png')
+
+        #Coins text
+        coins_image = BUTTON(10, 105)
+        coins_image.image_button('Design/coin.png')
+        
+        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+        coins_text.display_text()
+        
         if plant_stage == 4:
             transfer_to_garden_button.image_button('Design/next_arrow.png')
             matured_flower += 1
@@ -743,21 +799,41 @@ def screen_shop():
                     screen_plant()
                     print("Returning to plant screen")
                 if water_plant.check_for_input(pygame.mouse.get_pos()):
-                    water_count += 1
-                    watering_can.trigger() # Record the start time
+                    #spend coins(30) to proceed with the action
+                    if spend_coins(5):
+                        water_count += 1
+                        watering_can.trigger()
+                        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                        coins_text.display_text()
+                        save_game_state()
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
-                    fertilizer_count += 1
-                    fertilize.trigger()  # Record the start time
+                #spend coins(30) to proceed with the action
+                    if spend_coins(10):
+                        fertilizer_count += 1
+                        fertilize.trigger()
+                        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                        coins_text.display_text()
+                        save_game_state()
                 
                 #check if plant should grow
                 if water_count >= water_required and fertilizer_count >= fertilizer_required:
                     growth_plant()
 
+        global selected_plant_background
+        #update plant image
+        if plant_stage == 2:
+            selected_plant_background = 'Design/plant2.png'
+        elif plant_stage == 3:
+            selected_plant_background = 'Design/plant3.png' 
+        elif plant_stage == 4:
+            selected_plant_background = 'Design/plant4.png'
         bg(selected_plant_background)
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         watering_can.show()
         fertilize.show()
+
+        
 
 
         pygame.display.flip()
