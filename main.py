@@ -97,6 +97,10 @@ todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
 todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
 todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
 
+#flower
+matured_flower = 0
+planted_flower = 0
+
 def finish_task_3(button):
     if button == 1:
         todo_lists.remove(todo_lists[1])
@@ -624,7 +628,7 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
-    global plant_stage
+    global plant_stage,matured_flower
     transfer_to_garden_button = BUTTON(900,550, 100,91, blue)
     run = True
     while run:
@@ -649,6 +653,7 @@ def screen_plant() :
         shop.image_button('Design/shop-button.png')
         if plant_stage == 4:
             transfer_to_garden_button.image_button('Design/next_arrow.png')
+            matured_flower += 1
 
         pygame.display.flip()
 
