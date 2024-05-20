@@ -2,6 +2,7 @@ import pygame
 import json
 import os
 from classes_functions import *
+from pygame.locals import *
 
 pygame.init()
 pygame.mixer.init()
@@ -79,6 +80,13 @@ shop_back = BUTTON(345, 300, 100,80)
 music_1 = BUTTON(670, 450, 60, 60)
 music_2 = BUTTON(770, 450, 60, 60)
 music_3 = BUTTON(870, 450, 60, 60)
+
+play_music('Songs/music_1.MP3')
+
+#sounds
+mute = BUTTON(824,407, 90, 60)
+unmute = BUTTON(1000, 200, 60, 60)
+
 
 #user input for todo list
 user_input = ""
@@ -172,7 +180,7 @@ def load_game_state():
             checklist_1_button.update_color(blue)
     else:
         # Initialize game state to default values
-        level_bar.level = 1
+        level_bar.level = 0
         level_bar.xp = 0
         coins_bar.coins = 0
         todo_lists = [""]
@@ -182,6 +190,8 @@ def load_game_state():
 
 # background
 selected_background = 'Design/sunny.png'
+
+
 
 #internal function (ambience)
 def can_change_ambience(ambience):
@@ -200,6 +210,7 @@ def can_change_ambience(ambience):
     else:
         print("Ambience not found in the requirements.")  
         return False
+    
     
 #plant growth 
 plant_stage = 1
@@ -390,6 +401,15 @@ def screen_home(new_selected_background):
                                     started = False
                                     start_stop_button.update_text("START")
                                     print("finish lap")
+            #mute/unmute
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
+        
+                
 
         bg(selected_background)
         settings.image_button('Design/setting-button1.png')
@@ -516,6 +536,8 @@ def screen_settings():
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
 
+    
+
     while run:
 
         global pomodoro_length,break_length,lap_length,current_seconds
@@ -584,6 +606,9 @@ def screen_settings():
                 if music_3.check_for_input(pygame.mouse.get_pos()):
                     play_music('Songs/music_3.MP3')
 
+                if mute.check_for_input(pygame.mouse.get_pos()):
+                    print("Mute")
+
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
@@ -597,6 +622,8 @@ def screen_settings():
         minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
+
+ 
 
         if can_change_ambience('sunny'):
             sunny_bg.image_button('Design/nothing.png')
