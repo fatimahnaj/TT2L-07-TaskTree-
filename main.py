@@ -593,8 +593,9 @@ def screen_garden() :
     run = True
     dragging = False
     planted_flowers = 50
-    flower = pygame.image.load('Design/flower_draft.png')
+    flower = pygame.image.load('Design/flower.png')
     flower_rect = flower.get_rect()
+
     while run:
 
         for event in pygame.event.get():
