@@ -78,7 +78,7 @@ class BUTTON:
     
     def image_button(self,image_link):
         image = pygame.image.load(image_link)
-        screen.blit(image, (self.x,self.y))
+        screen.blit(image, (self.center_x,self.center_y))
 
     def update_color(self, new_color):
         self.color = new_color
