@@ -405,6 +405,10 @@ def screen_home(new_selected_background):
                         elif current_seconds == 0:
                                 if pomodoro:
                                     print("pomodoro completed")
+                                    coins_bar.addCoins(30)
+                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                                    coins_text.display_text()
+                                    
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     level_bar.addXP(20)
                                     level_bar.draw(screen)
@@ -706,7 +710,7 @@ def screen_plant() :
         
         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
-        
+
         if plant_stage == 4:
             transfer_to_garden_button.image_button('Design/next_arrow.png')
             matured_flower += 1
