@@ -839,4 +839,4 @@ def screen_shop():
     pygame.quit()
 
 
-screen_startup() 
+screen_startup()
