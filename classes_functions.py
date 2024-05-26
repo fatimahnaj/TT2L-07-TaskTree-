@@ -59,37 +59,51 @@ class BUTTON:
         self.center_x = self.x - self.width // 2
         self.center_y = self.y - self.height // 2
         self.circle_width = circle_width
+        self.disabled = False
 
     def draw_button(self):
-        set_button = pygame.Rect(self.x, self.y, self.width, self.height)
-        pygame.draw.rect(screen, self.color, set_button)
+        if not self.disabled:
+            set_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            pygame.draw.rect(screen, self.color, set_button)
+        else:
+            disabled_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            pygame.draw.rect(screen, (200, 200, 200), disabled_button)
 
     def draw_circle(self):
         circle_center = (self.x,self.y)
         pygame.draw.circle(screen, self.color, circle_center, 10, self.circle_width)
 
     def fill_circle(self,position):
-        rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
-            self.circle_width = 0
-        else:
-            self.circle_width = 3
+        if not self.disabled:
+            rect = pygame.Rect(self.x, self.y, self.width, self.height)
+            if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
+                self.circle_width = 0
+            else:
+                self.circle_width = 3
 
     
     def image_button(self,image_link):
-        image = pygame.image.load(image_link)
-        rect_2 = image.get_rect()
-        rect_2.topleft = (self.x, self.y)
-        screen.blit(image, rect_2)
+        if not self.disabled:
+            image = pygame.image.load(image_link)
+            rect_2 = image.get_rect()
+            rect_2.topleft = (self.x, self.y)
+            screen.blit(image, rect_2)
 
     def update_color(self, new_color):
         self.color = new_color
 
     def check_for_input(self,position):
-        rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
-        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
-            return True
+        if not self.disabled:
+            rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+            if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
+                return True
         return False
+    
+    def disable(self):
+        self.disabled = True
+
+    def enable(self):
+        self.disabled = False
     
 def bg(image_link):
     load_image = pygame.image.load(image_link)
@@ -162,3 +176,36 @@ def play_music(music_file):
     pygame.mixer.music.stop()
     pygame.mixer.music.load(music_file)
     pygame.mixer.music.play(-1)
+
+#comment
+class Comment:
+    def __init__(self, x, y, font_size=20, color=(255, 0, 0), duration=2000, font='DePixelHalbfett.ttf'):
+        self.x = x
+        self.y = y
+        self.font_size = font_size
+        self.color = color
+        self.duration = duration
+        self.font = font
+        self.text = ''
+        self.last_update_time = 0
+
+    def update_text(self, new_text):
+        self.text = new_text
+
+    def update_color(self, new_color):
+        self.color = new_color
+
+    def display(self, screen):
+        if self.text and pygame.time.get_ticks() - self.last_update_time < self.duration:
+            text = TEXT(self.text, self.x, self.y, self.font_size, self.color, font=self.font)
+            text.display_text()
+        else:
+            self.text = ''
+
+    def show(self, screen):
+        self.display(screen)
+
+    def show_for_duration(self, new_text, screen):
+        self.update_text(new_text)
+        self.last_update_time = pygame.time.get_ticks()
+        self.display(screen)
