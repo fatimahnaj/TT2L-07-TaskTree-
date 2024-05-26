@@ -107,6 +107,8 @@ water_required = 2
 fertilizer_required = 2
 selected_plant_background = 'Design/plant1.png'
 
+#garden
+locked_flowers = []
 #store the seed
 chosen_seed = 0
 seed_chosen = False
@@ -131,6 +133,8 @@ taskboard_visible = True
 # Create toggle button
 toggle_button = BUTTON(screen_width-70, screen_height-350, 50, 50, black)
 
+#flower
+matured_flower = []
 
 #save & load data
 def save_game_state():
@@ -258,7 +262,7 @@ def screen_startup():
                 run = False
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if start_button.check_for_input(pygame.mouse.get_pos()):
+                if start_button.is_clicked(pygame.mouse.get_pos()):
                     screen_home(selected_background)
                     print("Switching to home screen.")
 
@@ -312,7 +316,7 @@ def screen_home(new_selected_background):
             #pomodoro setup
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #check if start/stop button is clicked, toggle the pomodoro
-                if start_stop_button.check_for_input(pygame.mouse.get_pos()): 
+                if start_stop_button.is_clicked(pygame.mouse.get_pos()): 
                     if started:
                         started = False
                         start_stop_button.update_text("START")
@@ -320,7 +324,7 @@ def screen_home(new_selected_background):
                         started = True
                         start_stop_button.update_text("STOP")
                 #display pomodoro, stop the break/stopwatch
-                if pomodoro_button.check_for_input(pygame.mouse.get_pos()):
+                if pomodoro_button.is_clicked(pygame.mouse.get_pos()):
                     if started == False:
                         started = False
                         current_seconds = pomodoro_length
@@ -330,7 +334,7 @@ def screen_home(new_selected_background):
                     else:
                         current_seconds = current_seconds
                 #display break time, stop the pomodoro/stopwatch
-                if break_button.check_for_input(pygame.mouse.get_pos()):
+                if break_button.is_clicked(pygame.mouse.get_pos()):
                     if started == False:
                         started = False
                         current_seconds = break_length
@@ -340,7 +344,7 @@ def screen_home(new_selected_background):
                     else:
                         current_seconds = current_seconds
                 #display stopwatch, stop the pomodoro
-                if stopwatch_button.check_for_input(pygame.mouse.get_pos()):
+                if stopwatch_button.is_clicked(pygame.mouse.get_pos()):
                     if started == False:
                         started = False
                         current_seconds = timer
@@ -350,19 +354,19 @@ def screen_home(new_selected_background):
                     else:
                         current_seconds = current_seconds
                 #add to do list button
-                if add_task_button.check_for_input(pygame.mouse.get_pos()):
+                if add_task_button.is_clicked(pygame.mouse.get_pos()):
                     screen_user_input()
                 #settings button
-                if settings_button.check_for_input(pygame.mouse.get_pos()):
+                if settings_button.is_clicked(pygame.mouse.get_pos()):
                     screen_settings()
                     print("Switching to settings screen.")
                 #plant button
-                if plant_button.check_for_input(pygame.mouse.get_pos()):
+                if plant_button.is_clicked(pygame.mouse.get_pos()):
                     if not plant_button.disabled:
                         screen_plant()
                         print("Switching to plant screen.")
                 #garden button
-                if garden_button.check_for_input(pygame.mouse.get_pos()):
+                if garden_button.is_clicked(pygame.mouse.get_pos()):
                     screen_garden()
                     print("Switching to garden screen.")
                 #seed button
@@ -370,16 +374,16 @@ def screen_home(new_selected_background):
                     screen_seed()
                     print("Switching to seed screen.")
 
-                if uparrow.check_for_input(pygame.mouse.get_pos()):
+                if uparrow.is_clicked(pygame.mouse.get_pos()):
                     print("Up")
                     current_page = max(0, current_page - 1)
 
-                if downarrow.check_for_input(pygame.mouse.get_pos()):
+                if downarrow.is_clicked(pygame.mouse.get_pos()):
                     print("Down")
                     if current_page * maximum_task_per_page < len(tasks) - maximum_task_per_page: 
                         current_page += 1
 
-                if toggle_button.check_for_input(pygame.mouse.get_pos()):
+                if toggle_button.is_clicked(pygame.mouse.get_pos()):
                     taskboard_visible = not taskboard_visible
 
 
@@ -564,7 +568,7 @@ def screen_user_input():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.check_for_input(pygame.mouse.get_pos()):
+                if back_button.is_clicked(pygame.mouse.get_pos()):
                     screen_home(selected_background)
                     print("Returning to homescreen")
             #input_text
@@ -637,33 +641,33 @@ def screen_settings():
             if event.type == pygame.MOUSEBUTTONDOWN:
             
                 #pomodoro settings
-                if increase_pomodoro.check_for_input(pygame.mouse.get_pos()):
+                if increase_pomodoro.is_clicked(pygame.mouse.get_pos()):
                     if pomodoro_length == 3600:
                         pomodoro_length = pomodoro_length
                     else:
                         pomodoro_length = pomodoro_length + 300
                         print(pomodoro_length)
-                if decrease_pomodoro.check_for_input(pygame.mouse.get_pos()):
+                if decrease_pomodoro.is_clicked(pygame.mouse.get_pos()):
                     if pomodoro_length > 300:
                         pomodoro_length = pomodoro_length - 300
                         print(pomodoro_length)
                     else:
                         pomodoro_length = pomodoro_length
                 #break settings
-                if increase_break.check_for_input(pygame.mouse.get_pos()):
+                if increase_break.is_clicked(pygame.mouse.get_pos()):
                     if break_length == 3310:
                         break_length = break_length
                     else:
                         break_length = break_length + 300
                         print(break_length)
-                if decrease_break.check_for_input(pygame.mouse.get_pos()):
+                if decrease_break.is_clicked(pygame.mouse.get_pos()):
                     if break_length > 300:
                         break_length = break_length - 300
                         print(break_length)
                     else:
                         break_length = break_length
                 #ambience buttons
-                if sunny_bg.check_for_input(pygame.mouse.get_pos()):
+                if sunny_bg.is_clicked(pygame.mouse.get_pos()):
                      
                     res = can_change_ambience('sunny')
 
@@ -678,7 +682,7 @@ def screen_settings():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
                             
-                if night_bg.check_for_input(pygame.mouse.get_pos()):
+                if night_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
 
                     if res == True:
@@ -692,7 +696,7 @@ def screen_settings():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
-                if snow_bg.check_for_input(pygame.mouse.get_pos()):
+                if snow_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
 
                     if res == True:
@@ -706,23 +710,23 @@ def screen_settings():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
-                if music_1.check_for_input(pygame.mouse.get_pos()):
+                if music_1.is_clicked(pygame.mouse.get_pos()):
                     play_music('Songs/music_1.MP3')
-                if music_2.check_for_input(pygame.mouse.get_pos()):
+                if music_2.is_clicked(pygame.mouse.get_pos()):
                     play_music('Songs/music_2.MP3')
-                if music_3.check_for_input(pygame.mouse.get_pos()):
+                if music_3.is_clicked(pygame.mouse.get_pos()):
                     play_music('Songs/music_3.MP3')
 
-                if mute.check_for_input(pygame.mouse.get_pos()):
+                if mute.is_clicked(pygame.mouse.get_pos()):
                     print("Mute")
                     pygame.mixer.music.pause()
 
-                if unmute.check_for_input(pygame.mouse.get_pos()):
+                if unmute.is_clicked(pygame.mouse.get_pos()):
                     print("Unmute")
                     pygame.mixer.music.unpause()
 
                 #back button
-                if back_button.check_for_input(pygame.mouse.get_pos()):
+                if back_button.is_clicked(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
                     screen_home(selected_background)
                     print("Returning to homescreen")
@@ -742,8 +746,9 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
-    global plant_stage, chosen_seed
+    global plant_stage,matured_flower, chosen_seed
     transfer_to_garden_button = BUTTON(900,550, 100,91, blue)
+    flower_value = 0
     run = True
     while run:
 
@@ -751,14 +756,17 @@ def screen_plant() :
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.check_for_input(pygame.mouse.get_pos()):
+                if back_button.is_clicked(pygame.mouse.get_pos()):
                     screen_home(selected_background)
                     print("Returning to homescreen")
                 #shop button
-                if shop_button.check_for_input(pygame.mouse.get_pos()):
+                if shop_button.is_clicked(pygame.mouse.get_pos()):
                     screen_shop()
                     print("Switching to shop screen.")
-                if transfer_to_garden_button.check_for_input(pygame.mouse.get_pos()):
+                if transfer_to_garden_button.is_clicked(pygame.mouse.get_pos()):
+                    flower_value += 1
+                    matured_flower.append(flower_value)
+                    print(f"Total flower rn : {matured_flower[-1]}")
                     screen_garden()
                     print("Switching to garden screen.")
 
@@ -811,47 +819,75 @@ def screen_plant() :
     pygame.quit()
 
 def screen_garden() :
+    global matured_flower,locked_flowers
     run = True
+
     dragging = False
-    planted_flowers = 50
-    flower = pygame.image.load('Design/flower_draft.png')
-    flower_rect = flower.get_rect()
+    flowers = []
+    finish_placement_button = BUTTON(screen_width-70, screen_height-80, 50, 50, dark_grey)
+    #based on value from matured_flower, store flower's rect into flowers (used for further codings)
+    for flower in matured_flower:
+        flower_img = pygame.image.load('Design/flower.png')
+        flower_rect = flower_img.get_rect()
+        flowers.append(flower_rect)
+
     while run:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if back_button.check_for_input(pygame.mouse.get_pos()):
-                    screen_home(selected_background)
+                if back_button.is_clicked(pygame.mouse.get_pos()):
                     print("Returning to homescreen")
-                if flower_rect.collidepoint(event.pos):
+                    screen_home(selected_background)
+                #repeat for each flower in flowers
+                for i, flower in enumerate(flowers, start=1):
+                    #check whether any flower is clicked
+                    if flower.collidepoint(event.pos):
                         dragging = True
+                        selected_flower = flower
+                        print(f"Flower is clicked")
+                    #check if the player has finish the flower placement
+
+
+                    if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
+
+                        finish_placement_button.update_color(blue)
+                        locked_flowers.append(selected_flower) #move the selected flower into locked_flowers; the flower now can't be move
+                        flowers.pop()
+                        matured_flower.pop()
+                        print(f"Flower has been locked")
+                #player cannot move it anymore flower from locked_flowers
+                for i, flower in enumerate(locked_flowers, start=1):
+                    if flower.collidepoint(event.pos):
+                        print(f"Flower cannot be moved")
+                        break
             elif event.type == pygame.MOUSEBUTTONUP:
-                dragging = False
+                    for i, flower in enumerate(flowers, start=1):
+
+                        dragging = False
+                        print(f"Flower is dropped")
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
-                    mouse_x, mouse_y = event.pos
-                    flower_rect.x = mouse_x - 20
-                    flower_rect.y = mouse_y - 18
-                    print(f"Cursor position = ({mouse_x},{mouse_y})")
-                    print(f"Image location = ({flower_rect.x},{flower_rect.y})")
+                        mouse_x, mouse_y = event.pos
+                        selected_flower.x = mouse_x - 20
+                        selected_flower.y = mouse_y - 18
 
-        if planted_flowers <= 10:
-            zoom_level = 3.0
-        elif planted_flowers <= 30:
-            zoom_level = 2.6
-        elif planted_flowers <= 60:
-            zoom_level = 2.2
-        elif planted_flowers <= 80:
-            zoom_level = 1.8
-        elif planted_flowers <= 100:
-            zoom_level = 1.4
-        elif planted_flowers <= 130:
-            zoom_level = 1.0
+        # if flowers <= 10:
+        #     zoom_level = 3.0
+        # elif flowers <= 30:
+        #     zoom_level = 2.6
+        # elif flowers <= 60:
+        #     zoom_level = 2.2
+        # elif flowers <= 80:
+        #     zoom_level = 1.8
+        # elif flowers <= 100:
+        #     zoom_level = 1.4
+        # elif flowers <= 130:
+        zoom_level = 1.0
 
         screen.fill((228, 255, 209)) # Fill the screen with green color
-        bg = pygame.image.load('Design/garden_draft.jpg')
+        bg = pygame.image.load('Design/garden.png')
         back.image_button('Design/back-button.png')
 
         main_surface = pygame.Surface((1540,800)) #crop/frame n make it center
@@ -867,8 +903,19 @@ def screen_garden() :
         # Blit the scaled main surface to the screen
         screen.blit(zoomed_main_surface, zoomed_main_surface_rect.topleft)
 
-        # Draw the image at its new position
-        screen.blit(flower, flower_rect.topleft)
+        back.image_button('Design/back-button.png')
+
+        finish_placement_button.draw_button()
+
+        #blit the flowers (these flower can be move)
+        for flower in flowers:
+            flower_img = pygame.image.load('Design/flower.png')
+            screen.blit(flower_img, flower)
+
+        #blit the flowers that have been locked to its permanent position
+        for flower in locked_flowers:
+            flower_img = pygame.image.load('Design/flower.png')
+            screen.blit(flower_img, flower)
 
         # Update the display
         pygame.display.flip()
@@ -938,10 +985,10 @@ def screen_shop():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if shop_back.check_for_input(pygame.mouse.get_pos()):
+                if shop_back.is_clicked(pygame.mouse.get_pos()):
                     screen_plant()
                     print("Returning to plant screen")
-                if water_plant.check_for_input(pygame.mouse.get_pos()):
+                if water_plant.is_clicked(pygame.mouse.get_pos()):
                     if water_count < water_required:
                         #spend coins(30) to proceed with the action
                         if spend_coins(5):
@@ -953,11 +1000,10 @@ def screen_shop():
                     else:
                         comment.show_for_duration('Your soil is already moist!  No need to water right now.', screen)
                         print("Not enough coins")
-                        notification.update_text("!Not enough coins!")
-                        
+                        notification.update_text("!Not enough coins!")   
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
                         
-                if fertilizer.check_for_input(pygame.mouse.get_pos()):
+                if fertilizer.is_clicked(pygame.mouse.get_pos()):
                     if fertilizer_count < fertilizer_required:
                         #spend coins(30) to proceed with the action
                         if spend_coins(10):
@@ -1022,5 +1068,5 @@ def screen_shop():
 
     pygame.quit()
 
-
-screen_startup()
+#run the startup screen
+screen_startup() 

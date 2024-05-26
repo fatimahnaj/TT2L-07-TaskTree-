@@ -36,7 +36,7 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
-    def check_for_input(self,position):
+    def is_clicked(self,position):
         self.rect = self.rect.get_rect(center=(self.x,self.y))
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             return True
@@ -69,6 +69,13 @@ class BUTTON:
             disabled_button = pygame.Rect(self.x, self.y, self.width, self.height)
             pygame.draw.rect(screen, (200, 200, 200), disabled_button)
 
+    def draw_hoverbutton(self,position,hover_color):
+        set_button = pygame.Rect(self.x, self.y, self.width, self.height)
+        pygame.draw.rect(screen, self.color, set_button)
+        if position[0] in range(set_button.left, set_button.right) and position[1] in range(set_button.top, set_button.bottom):
+            set_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            pygame.draw.rect(screen, hover_color, set_button)
+
     def draw_circle(self):
         circle_center = (self.x,self.y)
         pygame.draw.circle(screen, self.color, circle_center, 10, self.circle_width)
@@ -80,19 +87,18 @@ class BUTTON:
                 self.circle_width = 0
             else:
                 self.circle_width = 3
-
     
     def image_button(self,image_link):
         if not self.disabled:
             image = pygame.image.load(image_link)
             rect_2 = image.get_rect()
             rect_2.topleft = (self.x, self.y)
-            screen.blit(image, rect_2)
+            screen.blit(image, (self.center_x,self.center_y))
 
     def update_color(self, new_color):
         self.color = new_color
 
-    def check_for_input(self,position):
+    def is_clicked(self,position):
         if not self.disabled:
             rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
             if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
