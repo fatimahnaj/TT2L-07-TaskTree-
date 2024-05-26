@@ -74,6 +74,9 @@ plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
 garden = BUTTON(0, 0)
 garden_button = BUTTON(90, 490, 70, 70)
+seed = BUTTON(0, 0)
+seed_button = BUTTON(90, 390, 70, 70)
+quit = BUTTON(1067, 190, 50, 50)
 
 shop = BUTTON(0, 0)
 shop_button = BUTTON(60, 290, 100, 80)
@@ -106,6 +109,10 @@ selected_plant_background = 'Design/plant1.png'
 
 #garden
 locked_flowers = []
+
+#store the seed
+chosen_seed = 0
+seed_chosen = False
 
 #user input for todo list
 user_input = ""
@@ -186,6 +193,20 @@ def load_game_state():
     save_game_state()
 
 
+def save_seed_chosen_status():
+    with open('game_state.json', 'w') as f:
+        json.dump({'seed_chosen': seed_chosen, 'chosen_seed': chosen_seed}, f)
+
+
+def load_seed_chosen_status():
+    global seed_chosen, chosen_seed
+    if os.path.exists('game_state.json'):
+        with open('game_state.json', 'r') as f:
+            data = json.load(f)
+            seed_chosen = data.get('seed_chosen', False)
+            chosen_seed = data.get('chosen_seed', 0)
+
+
 # background
 selected_background = 'Design/sunny.png'
 
@@ -233,6 +254,7 @@ def screen_startup():
     run = True
 
     load_game_state()
+    load_seed_chosen_status()
 
     while run:
         
@@ -260,8 +282,6 @@ def screen_home(new_selected_background):
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
 
-
-
     # Create a font
     font = pygame.freetype.Font(None, 24)
 
@@ -271,14 +291,25 @@ def screen_home(new_selected_background):
     # Create a taskboard
     taskboard = pygame.Rect(1000, 500, 500, 250)
 
-
     maximum_task_per_page = 5
 
+    comment1 = Comment(260, 380)
+    comment1.update_color((255, 219, 108))
+    comment2 = Comment(290, 410)
+    comment2.update_color((255, 219, 88))
 
     run = True
     while run:
 
         global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
+        
+        if seed_chosen:
+            plant_button.enable()
+        else:
+            plant_button.disable()
+            comment1.show_for_duration('<<<  Please choose', screen)
+            comment2.show_for_duration('your seed first!', screen)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -332,12 +363,18 @@ def screen_home(new_selected_background):
                     print("Switching to settings screen.")
                 #plant button
                 if plant_button.is_clicked(pygame.mouse.get_pos()):
-                    screen_plant()
-                    print("Switching to plant screen.")
+                    if not plant_button.disabled:
+                        screen_plant()
+                        print("Switching to plant screen.")
                 #garden button
                 if garden_button.is_clicked(pygame.mouse.get_pos()):
                     screen_garden()
                     print("Switching to garden screen.")
+                #seed button
+                if seed_button.is_clicked(pygame.mouse.get_pos()):
+                    screen_seed()
+                    print("Switching to seed screen.")
+
                 if uparrow.is_clicked(pygame.mouse.get_pos()):
                     print("Up")
                     current_page = max(0, current_page - 1)
@@ -363,10 +400,6 @@ def screen_home(new_selected_background):
                             tasks.pop(task_index)
                             save_game_state()
                             break
-
-            
-                
-
 
             #counting the time
             if event.type == pygame.USEREVENT and started:
@@ -419,6 +452,7 @@ def screen_home(new_selected_background):
                                     started = False
                                     start_stop_button.update_text("START")
                                     print("finish lap")
+            
             #mute/unmute alternative
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
@@ -440,13 +474,13 @@ def screen_home(new_selected_background):
                     taskboard_visible = not taskboard_visible
 
 
-
-
-
         bg(selected_background)
         settings.image_button('Design/setting-button1.png')
         plant.image_button('Design/plant-button.png')
         garden.image_button('Design/garden-button.png')
+        seed.image_button('Design/seed-button.png')
+        comment1.show(screen)
+        comment2.show(screen)
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
@@ -517,7 +551,6 @@ def screen_home(new_selected_background):
             uparrow.image_button('Design/add_task_button.png')
             downarrow.image_button('Design/add_task_button.png')
             
-
 
         pygame.display.flip()
 
@@ -713,7 +746,7 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
-    global plant_stage,matured_flower
+    global plant_stage, chosen_seed, matured_flower
     transfer_to_garden_button = BUTTON(900,550, 100,91, blue)
     flower_value = 0
     run = True
@@ -737,14 +770,36 @@ def screen_plant() :
                     screen_garden()
                     print("Switching to garden screen.")
 
-        global selected_plant_background
-        #update plant image
-        if plant_stage == 2:
-            selected_plant_background = 'Design/plant2.png'
-        elif plant_stage == 3:
-            selected_plant_background = 'Design/plant3.png' 
-        elif plant_stage == 4:
-            selected_plant_background = 'Design/plant4.png'
+        # Update plant image based on the chosen seed
+        if chosen_seed == 1:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant3.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant4.png'
+        elif chosen_seed == 2:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant5.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant6.png'
+        elif chosen_seed == 3:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant7.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant8.png'
+
+
         bg(selected_plant_background)
         back.image_button('Design/back-button.png')
         shop.image_button('Design/shop-button.png')
@@ -867,6 +922,48 @@ def screen_garden() :
 
     pygame.quit()
 
+def screen_seed() :
+    run = True
+    global chosen_seed, seed_chosen
+    seed1 = BUTTON(600, 430, 90, 100)
+    seed2 = BUTTON(800, 430, 90, 100)
+    seed3 = BUTTON(1000, 430, 90, 100)
+    
+    while run :
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if seed1.is_clicked(pygame.mouse.get_pos()):
+                    chosen_seed = 1
+                    seed_chosen = True
+                    save_seed_chosen_status()
+                    screen_plant()
+                    print("Seed 1 chosen. Switching to plant screen.")
+                elif seed2.is_clicked(pygame.mouse.get_pos()):
+                    chosen_seed = 2
+                    seed_chosen = True
+                    save_seed_chosen_status()
+                    screen_plant()
+                    print("Seed 2 chosen. Switching to plant screen.")               
+                elif seed3.is_clicked(pygame.mouse.get_pos()):
+                    chosen_seed = 3
+                    seed_chosen = True
+                    save_seed_chosen_status()
+                    screen_plant()
+                    print("Seed 3 chosen. Switching to plant screen.")
+                if quit.is_clicked(pygame.mouse.get_pos()):
+                    screen_home(selected_background)
+                    print("Returning to homescreen")
+
+
+        bg('Design/seed-page.png')
+
+        pygame.display.flip()
+
+    pygame.quit()
+
 def screen_shop():
     global water_count, fertilizer_count, water_required, fertilizer_required
     run = True
@@ -876,8 +973,12 @@ def screen_shop():
     fertilize = POPUP('Design/fertilizer.png',800)
     textcoins = TEXT("5", 140, 400, 30, black)
     textsoil = TEXT("10", 140, 565, 30, black)
-    notification = TEXT("", 800, 100, 80, black)
 
+    #comment
+    comment = Comment(screen_width / 2, 100)
+    notification = Comment(screen_width / 2, 100)
+    notification.update_color(black)
+    notification.update_font_size(35)
     
     while run:
         
@@ -889,62 +990,83 @@ def screen_shop():
                     screen_plant()
                     print("Returning to plant screen")
                 if water_plant.is_clicked(pygame.mouse.get_pos()):
-                    #spend coins(30) to proceed with the action
-                    if spend_coins(5):
-                        water_count += 1
-                        watering_can.trigger()
-                        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                        coins_text.display_text()
-                        save_game_state()
-                    else:
-                        print("Not enough coins")
-                        notification.update_text("!Not enough coins!")
-                        
-                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
-                        
-                if fertilizer.is_clicked(pygame.mouse.get_pos()):
-                #spend coins(30) to proceed with the action
-                    if spend_coins(10):
-                        fertilizer_count += 1
-                        fertilize.trigger()
-                        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                        coins_text.display_text()
-                        save_game_state()
+                    if water_count < water_required:
+                        #spend coins(30) to proceed with the action
+                        if spend_coins(5):
+                            water_count += 1
+                            watering_can.trigger()
+                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                            coins_text.display_text()
+                            save_game_state()
+                        else:
+                            notification.show_for_duration('Not Enough Coins !', screen)
 
                     else:
-                        print("Not enough coins")
-                        notification.update_text("!Not enough coins!")
-                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)
-                
+                        comment.show_for_duration('Your soil is already moist!  No need to water right now.', screen)
+
+                if fertilizer.is_clicked(pygame.mouse.get_pos()):
+                    if fertilizer_count < fertilizer_required:
+                        #spend coins(30) to proceed with the action
+                        if spend_coins(10):
+                            fertilizer_count += 1
+                            fertilize.trigger()
+                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+                            coins_text.display_text()
+                            save_game_state()
+
+                        else:
+                            notification.show_for_duration('Not Enough Coins !', screen)
+
+                    else:
+                        comment.show_for_duration('Your plant looks vibrant and healthy!  No need for more fertilizer now.', screen)
+                                        
                 #check if plant should grow
                 if water_count >= water_required and fertilizer_count >= fertilizer_required:
                     growth_plant()
-            if event.type == CLEAR_NOTIFICATION_EVENT:
-                notification.update_text("")
 
-
-        global selected_plant_background
-        #update plant image
-        if plant_stage == 2:
-            selected_plant_background = 'Design/plant2.png'
-        elif plant_stage == 3:
-            selected_plant_background = 'Design/plant3.png' 
-        elif plant_stage == 4:
-            selected_plant_background = 'Design/plant4.png'
+        # Update plant image based on the chosen seed
+        if chosen_seed == 1:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant3.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant4.png'
+        elif chosen_seed == 2:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant5.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant6.png'
+        elif chosen_seed == 3:
+            if plant_stage == 1:
+                selected_plant_background = 'Design/plant1.png'
+            elif plant_stage == 2:
+                selected_plant_background = 'Design/plant2.png'
+            elif plant_stage == 3:
+                selected_plant_background = 'Design/plant7.png'
+            elif plant_stage == 4:
+                selected_plant_background = 'Design/plant8.png'
+        
+        
         bg(selected_plant_background)
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         watering_can.show()
         fertilize.show()
-
+        #display comment
+        comment.show(screen)
+        notification.show(screen)
         textsoil.display_text()
-        textcoins.display_text()
-        notification.display_text()
-    
+        textcoins.display_text()    
         
         pygame.display.flip()
 
     pygame.quit()
 
-#run the startup screen
 screen_startup() 
