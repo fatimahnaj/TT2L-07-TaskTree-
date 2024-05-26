@@ -1,5 +1,6 @@
 import pygame
 import json
+import datetime
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -15,6 +16,8 @@ pygame.display.set_caption('TaskTree')
 
 clock = pygame.time.Clock()
 clock.tick(60)  # Limit frame rate to 60 FPS
+
+CLEAR_NOTIFICATION_EVENT = pygame.USEREVENT + 1
 
 #colors
 black = (0,0,0)
@@ -552,8 +555,8 @@ def screen_settings():
     decrease_pomodoro = BUTTON(245, 350, 40, 20)
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
+    notification = TEXT("", 1320, 450, 30, blue)
 
-    
 
     while run:
 
@@ -564,6 +567,7 @@ def screen_settings():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+            
                 #pomodoro settings
                 if increase_pomodoro.check_for_input(pygame.mouse.get_pos()):
                     if pomodoro_length == 3600:
@@ -599,6 +603,12 @@ def screen_settings():
                         new_selected_background = 'Design/sunny.png'
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
+
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
                             
                 if night_bg.check_for_input(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
@@ -608,6 +618,12 @@ def screen_settings():
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
 
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
+
                 if snow_bg.check_for_input(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
 
@@ -615,6 +631,12 @@ def screen_settings():
                         new_selected_background = 'Design/snow.png'
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
+
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
                 if music_1.check_for_input(pygame.mouse.get_pos()):
                     play_music('Songs/music_1.MP3')
@@ -631,7 +653,8 @@ def screen_settings():
                     current_seconds = pomodoro_length
                     screen_home(selected_background)
                     print("Returning to homescreen")
-
+            if event.type == CLEAR_NOTIFICATION_EVENT:
+                notification.update_text("")
         
         bg('Design/setting page.png')
         back.image_button('Design/back-button.png')
@@ -639,6 +662,8 @@ def screen_settings():
         minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
+        notification.display_text()
+    
 
  
 
@@ -786,6 +811,10 @@ def screen_shop():
     fertilizer = BUTTON(120, 570, 120, 50)
     watering_can = POPUP('Design/watering-can.png',800)
     fertilize = POPUP('Design/fertilizer.png',800)
+    textcoins = TEXT("5", 140, 400, 30, black)
+    textsoil = TEXT("10", 140, 565, 30, black)
+    notification = TEXT("", 800, 100, 80, black)
+
     
     while run:
         
@@ -804,6 +833,13 @@ def screen_shop():
                         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
                         coins_text.display_text()
                         save_game_state()
+                    else:
+                        print("Not enough coins")
+                        notification.update_text("!Not enough coins!")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
+                        
+
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
                 #spend coins(30) to proceed with the action
                     if spend_coins(10):
@@ -812,10 +848,18 @@ def screen_shop():
                         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
                         coins_text.display_text()
                         save_game_state()
+
+                    else:
+                        print("Not enough coins")
+                        notification.update_text("!Not enough coins!")
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)
                 
                 #check if plant should grow
                 if water_count >= water_required and fertilizer_count >= fertilizer_required:
                     growth_plant()
+            if event.type == CLEAR_NOTIFICATION_EVENT:
+                notification.update_text("")
+
 
         global selected_plant_background
         #update plant image
@@ -831,9 +875,10 @@ def screen_shop():
         watering_can.show()
         fertilize.show()
 
+        textsoil.display_text()
+        textcoins.display_text()
+        notification.display_text()
         
-
-
         pygame.display.flip()
 
     pygame.quit()
