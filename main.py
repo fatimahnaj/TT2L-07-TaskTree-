@@ -364,7 +364,7 @@ def screen_home(new_selected_background):
                     else:
                         current_seconds = current_seconds
                 #add to do list button
-                if add_task_button.check_for_input(pygame.mouse.get_pos()):
+                if add_task_button.is_clicked(pygame.mouse.get_pos()):
                     screen_user_input()
                 if add_task_button.is_clicked(pygame.mouse.get_pos()):
                     #todo list cannot exceed 3 tasks
@@ -401,16 +401,16 @@ def screen_home(new_selected_background):
                 if garden_button.is_clicked(pygame.mouse.get_pos()):
                     screen_garden()
                     print("Switching to garden screen.")
-                if uparrow.check_for_input(pygame.mouse.get_pos()):
+                if uparrow.is_clicked(pygame.mouse.get_pos()):
                     print("Up")
                     current_page = max(0, current_page - 1)
 
-                if downarrow.check_for_input(pygame.mouse.get_pos()):
+                if downarrow.is_clicked(pygame.mouse.get_pos()):
                     print("Down")
                     if current_page * maximum_task_per_page < len(tasks) - maximum_task_per_page: 
                         current_page += 1
 
-                if toggle_button.check_for_input(pygame.mouse.get_pos()):
+                if toggle_button.is_clicked(pygame.mouse.get_pos()):
                     taskboard_visible = not taskboard_visible
 
 
@@ -751,7 +751,7 @@ def screen_settings():
                     print("Mute")
                     pygame.mixer.music.pause()
 
-                if unmute.check_for_input(pygame.mouse.get_pos()):
+                if unmute.is_clicked(pygame.mouse.get_pos()):
                     print("Unmute")
                     pygame.mixer.music.unpause()
 
