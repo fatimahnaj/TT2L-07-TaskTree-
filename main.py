@@ -668,7 +668,6 @@ def screen_settings():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
-                if snow_bg.check_for_input(pygame.mouse.get_pos()):
                 if snow_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
 
@@ -683,7 +682,6 @@ def screen_settings():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
-                if music_1.check_for_input(pygame.mouse.get_pos()):
                 if music_1.is_clicked(pygame.mouse.get_pos()):
                     play_music('Songs/music_1.MP3')
                 if music_2.is_clicked(pygame.mouse.get_pos()):
@@ -924,8 +922,6 @@ def screen_shop():
                         
                         pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
                         
-
-                if fertilizer.check_for_input(pygame.mouse.get_pos()):
                 if fertilizer.is_clicked(pygame.mouse.get_pos()):
                 #spend coins(30) to proceed with the action
                     if spend_coins(10):
