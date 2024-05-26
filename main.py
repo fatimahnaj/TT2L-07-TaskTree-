@@ -1,6 +1,6 @@
 import pygame
 import json
-import datetime
+from datetime import date, timedelta
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -90,7 +90,11 @@ play_music('Songs/music_1.MP3')
 mute = BUTTON(680, 360, 60, 60)
 unmute = BUTTON(830, 360, 60, 60)
 
+#streak
+streak_count = 0
+last_completed_date = date.today().isoformat()
 
+streak_text = TEXT("Streaks: " + str(streak_count), 200, 250, 50, black)
 
 #plant growth 
 plant_stage = 1
@@ -175,14 +179,16 @@ def save_game_state():
         'tasks': tasks,
         'plant_stage': plant_stage,
         'water_count': water_count,
-        'fertilizer_count': fertilizer_count
+        'fertilizer_count': fertilizer_count,
+        'streak_count': 0,
+        'last_completed_date': date.today().isoformat()        
         
     }
     with open('game_state.txt', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks
+    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks, streak_count, last_completed_date
     if os.path.exists('game_state.txt'):
         with open('game_state.txt', 'r') as f:
             game_state = json.load(f)
@@ -193,6 +199,8 @@ def load_game_state():
             plant_stage = game_state.get('plant_stage', 1)
             water_count = game_state.get('water_count', 0)
             fertilizer_count = game_state.get('fertilizer_count', 0)
+            streak_count = game_state.get('streak_count', 0)
+            last_completed_date = game_state.get('last_completed_date', date.today().isoformat())
     else:
         # Initialize game state to default values
         level_bar.level = 0
@@ -202,6 +210,21 @@ def load_game_state():
         plant_stage = 1
         water_count = 0
         fertilizer_count = 0
+        streak_count = 0
+        last_completed_date = date.today().isoformat()
+
+    #update streak count
+    today = date.today()
+    last_completed_date = date.fromisoformat(last_completed_date)
+
+    if today - last_completed_date == timedelta(days=1):
+        streak_count += 1
+    else:
+        streak_count = 0
+
+    game_state['last_completed_date'] = today.isoformat()
+    save_game_state()
+
 
 # background
 selected_background = 'Design/sunny.png'
@@ -288,7 +311,6 @@ def screen_home(new_selected_background):
     # Create a taskboard
     taskboard = pygame.Rect(1000, 500, 500, 250)
 
-    #Task Up and Down Button
 
     maximum_task_per_page = 5
 
@@ -391,17 +413,16 @@ def screen_home(new_selected_background):
                 if toggle_button.check_for_input(pygame.mouse.get_pos()):
                     taskboard_visible = not taskboard_visible
 
-                # Get the mouse click position
+
                 mouse_pos = pygame.mouse.get_pos()
 
                 # Check if the mouse click position is within a task
                 for i in range(maximum_task_per_page):
                     task_index = current_page * maximum_task_per_page + i
                     if task_index < len(tasks):
-                        # Adjust the rectangle to include the circle
                         task_rect = pygame.Rect(taskboard.x + 10, taskboard.y + 50 + i * 30, taskboard.width - 20, 30)
                         if task_rect.collidepoint(mouse_pos):
-                            # Remove the task from the list
+                            # Click to remove task
                             tasks.pop(task_index)
                             save_game_state()
                             break
@@ -520,26 +541,42 @@ def screen_home(new_selected_background):
         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
 
+        #streak
+        streak_image = BUTTON(10, 700)
+        streak_image.image_button('Design/coin.png')
+        streak_text = TEXT("Streaks: " + str(streak_count), 210, 750, 50, black)
+        streak_text.display_text()
+
         # Task bar
         if taskboard_visible:
             # Draw the taskboard
             pygame.draw.rect(screen, grey, taskboard)
 
-            # Draw the tasks for the current page
+            # draw the tasks for the current page
             for i in range(maximum_task_per_page):
                 task_index = current_page * maximum_task_per_page + i
                 if task_index < len(tasks):
                     task = tasks[task_index]
-                    # Draw a small circle to the left of the task
-                    pygame.draw.circle(screen, (0, 0, 0), (taskboard.x + 15, taskboard.y + 70 + i * 30), 5)
-                    # Render the task text
-                    font.render_to(screen, (taskboard.x + 30, taskboard.y + 65 + i * 30), task, (0, 0, 0))
+                    # circle
+                    circle_pos = (taskboard.x + 15, taskboard.y + 70 + i * 30)
+                    text_pos = (taskboard.x + 30, taskboard.y + 65 + i * 30)
+                    text_rect = font.get_rect(task)
+                    text_size = text_rect.size
+                    # rect covers the circle and text
+                    task_rect = pygame.Rect(circle_pos[0] - 5, circle_pos[1] - 5, 20 + text_size[0], text_size[1])
+                    if task_rect.collidepoint(pygame.mouse.get_pos()):
+                        #filled circle
+                        pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5)
+                    else:
+                        #hollow circle
+                        pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5, 1)
+                    font.render_to(screen, text_pos, task, (0, 0, 0))
 
             # Add task button
             add_task_text.display_text()
             add_task_button.image_button('Design/add_task_button.png')
 
-            #Task Up and Down Button
+            #Task Up & Down Button
             uparrow.image_button('Design/add_task_button.png')
             downarrow.image_button('Design/add_task_button.png')
             
@@ -601,6 +638,27 @@ def screen_settings():
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
     notification = TEXT("", 1320, 450, 30, blue)
+
+    if can_change_ambience('sunny'):
+        sunny_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        sunny_bg.image_button('Design/lock.png')
+            # false, locked
+
+    if can_change_ambience('night'):
+        night_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        night_bg.image_button('Design/lock.png')
+            # false, locked
+    
+    if can_change_ambience('snow'):
+        snow_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        snow_bg.image_button('Design/lock.png')
+            # false, locked
 
     while run:
 
@@ -712,27 +770,6 @@ def screen_settings():
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
         notification.display_text()
-
-        if can_change_ambience('sunny'):
-            sunny_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            sunny_bg.image_button('Design/lock.png')
-             # false, locked
-
-        if can_change_ambience('night'):
-            night_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            night_bg.image_button('Design/lock.png')
-             # false, locked
-        
-        if can_change_ambience('snow'):
-            snow_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            snow_bg.image_button('Design/lock.png')
-             # false, locked
 
         pygame.display.flip()
 
