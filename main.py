@@ -727,13 +727,11 @@ def screen_garden() :
     lock = False
     dragging = False
     planted_flowers = []
-    for flower in matured_flower:
-        flower = pygame.image.load('Design/flower.png')
-        flower_rect = flower.get_rect()
-        planted_flowers.append(flower_rect)
-    flower1 = pygame.image.load('Design/flower.png')
-    flower1_rect = flower1.get_rect()
     finish_placement_button = BUTTON(screen_width-70, screen_height-80, 50, 50, dark_grey)
+    for flower in matured_flower:
+        flower_img = pygame.image.load('Design/flower.png')
+        flower_rect = flower_img.get_rect()
+        planted_flowers.append(flower_rect)
 
     while run:
 
@@ -742,29 +740,30 @@ def screen_garden() :
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.is_clicked(pygame.mouse.get_pos()):
-                    screen_home(selected_background)
                     print("Returning to homescreen")
-                if flower1_rect.collidepoint(event.pos):
-                    if lock != True:
-                        dragging = True
-                        print("Flower1 is dragged")
-                    else:
-                        print("Flower1 cannot be move.")
-                if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
-                    lock = True
-                    finish_placement_button.update_color(blue)
-                    print("Flower1 has been locked.")
+                    screen_home(selected_background)
+                for i, flower in enumerate(planted_flowers, start=1):
+                    if flower.collidepoint(event.pos):
+                        if lock != True:
+                            dragging = True
+                            current_flower = flower
+                            print(f"Flower {i} is clicked")
+                        else:
+                            print(f"Flower {i} cannot be moved")
+                    if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
+                        lock = True
+                        finish_placement_button.update_color(blue)
+                        print(f"Flower {i} has been locked")
             elif event.type == pygame.MOUSEBUTTONUP:
                 if lock != True:
-                    dragging = False
-                    print("Flower1 is dropped")
+                    for i, flower in enumerate(planted_flowers, start=1):
+                        dragging = False
+                        print(f"Flower {i} is dropped")
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
-                    mouse_x, mouse_y = event.pos
-                    flower1_rect.x = mouse_x - 20
-                    flower1_rect.y = mouse_y - 18
-                    #print(f"Cursor position = ({mouse_x},{mouse_y})")
-                    #print(f"Image location = ({flower1_rect.x},{flower1_rect.y})")
+                        mouse_x, mouse_y = event.pos
+                        current_flower.x = mouse_x - 20
+                        current_flower.y = mouse_y - 18
 
         # if planted_flowers <= 10:
         #     zoom_level = 3.0
@@ -796,15 +795,12 @@ def screen_garden() :
         # Blit the scaled main surface to the screen
         screen.blit(zoomed_main_surface, zoomed_main_surface_rect.topleft)
 
-        # Draw the image at its new position
-        # for planted_flowers <= matured_flower:
-        #     flower = pygame.image.load('Design/flower.png')
-        #     flower_rect = flower.get_rect()
-        #     screen.blit(flower, flower_rect.topleft)
-        #     planted_flowers += 1
+        back.image_button('Design/back-button.png')
 
-        screen.blit(flower1, flower1_rect.topleft)
         finish_placement_button.draw_button()
+        for flower in planted_flowers:
+            flower_img = pygame.image.load('Design/flower.png')
+            screen.blit(flower_img, flower)
 
         # Update the display
         pygame.display.flip()

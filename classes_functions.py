@@ -81,7 +81,6 @@ class BUTTON:
             self.circle_width = 0
         else:
             self.circle_width = 3
-
     
     def image_button(self,image_link):
         image = pygame.image.load(image_link)
