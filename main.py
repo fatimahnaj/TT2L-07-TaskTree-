@@ -87,8 +87,8 @@ music_3 = BUTTON(870, 450, 60, 60)
 play_music('Songs/music_1.MP3')
 
 #sounds
-mute = BUTTON(824,407, 90, 60)
-unmute = BUTTON(1000, 200, 60, 60)
+mute = BUTTON(680, 360, 60, 60)
+unmute = BUTTON(830, 360, 60, 60)
 
 #plant growth 
 plant_stage = 1
@@ -421,9 +421,10 @@ def screen_home(new_selected_background):
                                     started = False
                                     start_stop_button.update_text("START")
                                     print("finish lap")
-            #mute/unmute
+            #mute/unmute alternative
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
+
                     pygame.mixer.music.pause()
                 if event.key == pygame.K_n:
                     pygame.mixer.music.unpause()
@@ -647,6 +648,11 @@ def screen_settings():
 
                 if mute.check_for_input(pygame.mouse.get_pos()):
                     print("Mute")
+                    pygame.mixer.music.pause()
+
+                if unmute.check_for_input(pygame.mouse.get_pos()):
+                    print("Unmute")
+                    pygame.mixer.music.unpause()
 
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
