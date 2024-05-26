@@ -267,7 +267,6 @@ def screen_home(new_selected_background):
     # Create a taskboard
     taskboard = pygame.Rect(1000, 500, 500, 250)
 
-    #Task Up and Down Button
 
     maximum_task_per_page = 5
 
@@ -347,17 +346,16 @@ def screen_home(new_selected_background):
                 if toggle_button.check_for_input(pygame.mouse.get_pos()):
                     taskboard_visible = not taskboard_visible
 
-                # Get the mouse click position
+
                 mouse_pos = pygame.mouse.get_pos()
 
                 # Check if the mouse click position is within a task
                 for i in range(maximum_task_per_page):
                     task_index = current_page * maximum_task_per_page + i
                     if task_index < len(tasks):
-                        # Adjust the rectangle to include the circle
                         task_rect = pygame.Rect(taskboard.x + 10, taskboard.y + 50 + i * 30, taskboard.width - 20, 30)
                         if task_rect.collidepoint(mouse_pos):
-                            # Remove the task from the list
+                            # Click to remove task
                             tasks.pop(task_index)
                             save_game_state()
                             break
@@ -487,33 +485,31 @@ def screen_home(new_selected_background):
             # Draw the taskboard
             pygame.draw.rect(screen, grey, taskboard)
 
-            # Draw the tasks for the current page
+            # draw the tasks for the current page
             for i in range(maximum_task_per_page):
                 task_index = current_page * maximum_task_per_page + i
                 if task_index < len(tasks):
                     task = tasks[task_index]
-                    # Calculate the position of the circle
+                    # circle
                     circle_pos = (taskboard.x + 15, taskboard.y + 70 + i * 30)
-                    # Calculate the position and size of the task text
                     text_pos = (taskboard.x + 30, taskboard.y + 65 + i * 30)
                     text_rect = font.get_rect(task)
                     text_size = text_rect.size
-                    # Create a rectangle that covers the circle and the text
+                    # rect covers the circle and text
                     task_rect = pygame.Rect(circle_pos[0] - 5, circle_pos[1] - 5, 20 + text_size[0], text_size[1])
-                    # Check if the mouse is over the task
                     if task_rect.collidepoint(pygame.mouse.get_pos()):
-                        # Draw a filled circle
+                        #filled circle
                         pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5)
                     else:
-                        # Draw a hollow circle
+                        #hollow circle
                         pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5, 1)
-                    # Render the task text
                     font.render_to(screen, text_pos, task, (0, 0, 0))
+
             # Add task button
             add_task_text.display_text()
             add_task_button.image_button('Design/add_task_button.png')
 
-            #Task Up and Down Button
+            #Task Up & Down Button
             uparrow.image_button('Design/add_task_button.png')
             downarrow.image_button('Design/add_task_button.png')
             
