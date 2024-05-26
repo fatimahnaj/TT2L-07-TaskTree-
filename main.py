@@ -304,6 +304,10 @@ def screen_home(new_selected_background):
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
+    comment1 = Comment(260, 380)
+    comment1.update_color((255, 219, 108))
+    comment2 = Comment(290, 410)
+    comment2.update_color((255, 219, 88))
 
     run = True
     while run:
@@ -314,6 +318,9 @@ def screen_home(new_selected_background):
             plant_button.enable()
         else:
             plant_button.disable()
+            comment1.show_for_duration('<<<  Please choose', screen)
+            comment2.show_for_duration('your seed first!', screen)
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -464,6 +471,8 @@ def screen_home(new_selected_background):
         plant.image_button('Design/plant-button.png')
         garden.image_button('Design/garden-button.png')
         seed.image_button('Design/seed-button.png')
+        comment1.show(screen)
+        comment2.show(screen)
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
