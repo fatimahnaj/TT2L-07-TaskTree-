@@ -1,5 +1,6 @@
 import pygame
 import json
+from datetime import date, timedelta
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -15,6 +16,8 @@ pygame.display.set_caption('TaskTree')
 
 clock = pygame.time.Clock()
 clock.tick(60)  # Limit frame rate to 60 FPS
+
+CLEAR_NOTIFICATION_EVENT = pygame.USEREVENT + 1
 
 #colors
 black = (0,0,0)
@@ -87,8 +90,14 @@ music_3 = BUTTON(870, 450, 60, 60)
 play_music('Songs/music_1.MP3')
 
 #sounds
-mute = BUTTON(824,407, 90, 60)
-unmute = BUTTON(1000, 200, 60, 60)
+mute = BUTTON(680, 360, 60, 60)
+unmute = BUTTON(830, 360, 60, 60)
+
+#streak
+streak_count = 0
+last_completed_date = date.today().isoformat()
+
+streak_text = TEXT("Streaks: " + str(streak_count), 200, 250, 50, black)
 
 #plant growth 
 plant_stage = 1
@@ -107,49 +116,21 @@ user_input = ""
 input_text = TEXT(user_input, 780,350,20, grey, grey,"DePixelHalbfett.ttf")
 add_task_button = BUTTON(screen_width-70, screen_height-80, 50, 50, black)
 add_task_text = TEXT("Todo list :", 1250, 525, 20, dark_grey, dark_grey,"DePixelHalbfett.ttf")
-checklist_1_button = BUTTON(1020, 570, 20, 20, grey)
-checklist_2_button = BUTTON(1020, 620, 20, 20, grey)
-checklist_3_button = BUTTON(1020, 670, 20, 20, grey)
+
 input_your_text = TEXT("Enter your task for today !", 800, 200, 30, blue, blue,"DePixelHalbfett.ttf")
-todo_lists = [""]
-todo1 = ""
-todo2 = ""
-todo3 = ""
-todo1_text = TEXT(todo1, 1250, 570, 18, black, black,"DePixelHalbfett.ttf")
-todo2_text = TEXT(todo2, 1250, 620, 18, black, black,"DePixelHalbfett.ttf")
-todo3_text = TEXT(todo3, 1250, 670, 18, black, black,"DePixelHalbfett.ttf")
 
-def finish_task_3(button):
-    if button == 1:
-        todo_lists.remove(todo_lists[1])
-        todo1_text.update_text(todo_lists[1])
-        todo2_text.update_text(todo_lists[2])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    elif button == 2:
-        todo_lists.remove(todo_lists[2])
-        todo2_text.update_text(todo_lists[2])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    elif button == 3:
-        todo_lists.remove(todo_lists[3])
-        todo3 = ""
-        todo3_text.update_text(todo3)
-    checklist_3_button.update_color(grey)
-    save_game_state()
+uparrow = BUTTON(screen_width-500, screen_height-80, 50, 50, black)
+downarrow = BUTTON(screen_width-400, screen_height-80, 50, 50, black)
 
-def finish_task_2(button):
-    if button == 1:
-        todo_lists.remove(todo_lists[1])
-        todo1_text.update_text(todo_lists[1])
-        todo2 = ""
-        todo2_text.update_text(todo2)
-    elif button == 2:
-        todo_lists.remove(todo_lists[2])
-        todo2 = ""
-        todo2_text.update_text(todo2)
-    checklist_2_button.update_color(grey)
-    save_game_state()   
+# Create a list of tasks
+tasks = ["Task {}".format(i + 1) for i in range(21)]
+
+# Initialize taskboard visibility
+taskboard_visible = True
+
+# Create toggle button
+toggle_button = BUTTON(screen_width-70, screen_height-350, 50, 50, black)
+
 
 #save & load data
 def save_game_state():
@@ -157,61 +138,54 @@ def save_game_state():
         'level': level_bar.level,
         'level_xp': level_bar.xp,
         'coins': coins_bar.coins,
-        'todo_lists': todo_lists,
-        'todo1': todo1,
-        'todo2': todo2,
-        'todo3': todo3,
+        'tasks': tasks,
         'plant_stage': plant_stage,
         'water_count': water_count,
-        'fertilizer_count': fertilizer_count
+        'fertilizer_count': fertilizer_count,
+        'streak_count': 0,
+        'last_completed_date': date.today().isoformat()        
         
     }
     with open('game_state.txt', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, todo_lists, todo1, todo2, todo3, plant_stage, water_count, fertilizer_count, selected_plant_background
+    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks, streak_count, last_completed_date
     if os.path.exists('game_state.txt'):
         with open('game_state.txt', 'r') as f:
             game_state = json.load(f)
             level_bar.level = game_state.get('level', 0)
             level_bar.xp = game_state.get('level_xp', 0)
             coins_bar.coins = game_state.get('coins', 0)
-            todo_lists = game_state.get('todo_lists', [""])
-            todo1 = game_state.get('todo1', "")
-            todo2 = game_state.get('todo2', "")
-            todo3 = game_state.get('todo3', "")
+            tasks = game_state.get('tasks', [])
             plant_stage = game_state.get('plant_stage', 1)
             water_count = game_state.get('water_count', 0)
             fertilizer_count = game_state.get('fertilizer_count', 0)
-
-        todo1_text.update_text(todo1)
-        todo2_text.update_text(todo2)
-        todo3_text.update_text(todo3)
-
-        if len(todo_lists) == 3+1:
-            checklist_1_button.update_color(blue)
-            checklist_2_button.update_color(blue)
-            checklist_3_button.update_color(blue)
-        elif len(todo_lists) == 2+1:
-            checklist_1_button.update_color(blue)
-            checklist_2_button.update_color(blue)
-        elif len(todo_lists) == 1+1:
-            checklist_1_button.update_color(blue)
-
-        
+            streak_count = game_state.get('streak_count', 0)
+            last_completed_date = game_state.get('last_completed_date', date.today().isoformat())
     else:
         # Initialize game state to default values
         level_bar.level = 0
         level_bar.xp = 0
         coins_bar.coins = 0
-        todo_lists = [""]
-        todo1 = ""
-        todo2 = ""
-        todo3 = ""
+        tasks = []
         plant_stage = 1
         water_count = 0
         fertilizer_count = 0
+        streak_count = 0
+        last_completed_date = date.today().isoformat()
+
+    #update streak count
+    today = date.today()
+    last_completed_date = date.fromisoformat(last_completed_date)
+
+    if today - last_completed_date == timedelta(days=1):
+        streak_count += 1
+    else:
+        streak_count = 0
+
+    game_state['last_completed_date'] = today.isoformat()
+    save_game_state()
 
 
 def save_seed_chosen_status():
@@ -230,8 +204,6 @@ def load_seed_chosen_status():
 
 # background
 selected_background = 'Design/sunny.png'
-
-
 
 #internal function (ambience)
 def can_change_ambience(ambience):
@@ -304,6 +276,18 @@ def screen_home(new_selected_background):
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
+
+    # Create a font
+    font = pygame.freetype.Font(None, 24)
+
+    # Create a variable to store the current page
+    current_page = 0
+
+    # Create a taskboard
+    taskboard = pygame.Rect(1000, 500, 500, 250)
+
+    maximum_task_per_page = 5
+
     comment1 = Comment(260, 380)
     comment1.update_color((255, 219, 108))
     comment2 = Comment(290, 410)
@@ -312,7 +296,7 @@ def screen_home(new_selected_background):
     run = True
     while run:
 
-        global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,todo3
+        global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
         
         if seed_chosen:
             plant_button.enable()
@@ -367,28 +351,7 @@ def screen_home(new_selected_background):
                         current_seconds = current_seconds
                 #add to do list button
                 if add_task_button.check_for_input(pygame.mouse.get_pos()):
-                    #todo list cannot exceed 3 tasks
-                    if len(todo_lists) < 4:
-                        screen_user_input()
-                #checked/finish our task
-                if checklist_1_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(1)
-                    elif len(todo_lists) == 2+1:
-                        finish_task_2(1)
-                    elif len(todo_lists) == 1+1:
-                        todo_lists.remove(todo_lists[1])
-                        todo1 = ""
-                        todo1_text.update_text(todo1)
-                        checklist_1_button.update_color(grey)
-                if checklist_2_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(2)
-                    elif len(todo_lists) == 2+1:
-                        finish_task_2(2)
-                if checklist_3_button.check_for_input(pygame.mouse.get_pos()):
-                    if len(todo_lists) == 3+1:
-                        finish_task_3(3)
+                    screen_user_input()
                 #settings button
                 if settings_button.check_for_input(pygame.mouse.get_pos()):
                     screen_settings()
@@ -406,6 +369,33 @@ def screen_home(new_selected_background):
                 if seed_button.check_for_input(pygame.mouse.get_pos()):
                     screen_seed()
                     print("Switching to seed screen.")
+
+                if uparrow.check_for_input(pygame.mouse.get_pos()):
+                    print("Up")
+                    current_page = max(0, current_page - 1)
+
+                if downarrow.check_for_input(pygame.mouse.get_pos()):
+                    print("Down")
+                    if current_page * maximum_task_per_page < len(tasks) - maximum_task_per_page: 
+                        current_page += 1
+
+                if toggle_button.check_for_input(pygame.mouse.get_pos()):
+                    taskboard_visible = not taskboard_visible
+
+
+                mouse_pos = pygame.mouse.get_pos()
+
+                # Check if the mouse click position is within a task
+                for i in range(maximum_task_per_page):
+                    task_index = current_page * maximum_task_per_page + i
+                    if task_index < len(tasks):
+                        task_rect = pygame.Rect(taskboard.x + 10, taskboard.y + 50 + i * 30, taskboard.width - 20, 30)
+                        if task_rect.collidepoint(mouse_pos):
+                            # Click to remove task
+                            tasks.pop(task_index)
+                            save_game_state()
+                            break
+
             #counting the time
             if event.type == pygame.USEREVENT and started:
                 if stopwatch:
@@ -457,13 +447,26 @@ def screen_home(new_selected_background):
                                     started = False
                                     start_stop_button.update_text("START")
                                     print("finish lap")
-            #mute/unmute
+            
+            #mute/unmute alternative
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
+
                     pygame.mixer.music.pause()
                 if event.key == pygame.K_n:
                     pygame.mixer.music.unpause()
 
+                if event.key == pygame.K_UP:
+                    # Go to the previous page when the up arrow key is pressed
+                    current_page = max(0, current_page - 1)
+
+                if event.key == pygame.K_DOWN:
+                    # Go to the next page when the down arrow key is pressed
+                    if current_page * maximum_task_per_page < len(tasks) - maximum_task_per_page:  # Check if there is at least one more task to display
+                        current_page += 1
+
+                if event.key == pygame.K_y:
+                    taskboard_visible = not taskboard_visible
 
 
         bg(selected_background)
@@ -477,19 +480,7 @@ def screen_home(new_selected_background):
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
         start_stop_button.display_text()
-        taskboard = pygame.Rect(1000, 500, 500, 250)
-        pygame.draw.rect(screen, grey, taskboard)
-        add_task_text.display_text()
-        add_task_button.image_button('Design/add_task_button.png')
-        todo1_text.display_text()
-        todo2_text.display_text()
-        todo3_text.display_text()
-        checklist_1_button.draw_circle()
-        checklist_2_button.draw_circle()
-        checklist_3_button.draw_circle()
-        checklist_1_button.fill_circle(pygame.mouse.get_pos())
-        checklist_2_button.fill_circle(pygame.mouse.get_pos())
-        checklist_3_button.fill_circle(pygame.mouse.get_pos())
+        toggle_button.image_button('Design/add_task_button.png')
 
 
         if current_seconds >= 0:
@@ -516,6 +507,47 @@ def screen_home(new_selected_background):
         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
 
+        #streak
+        streak_image = BUTTON(10, 700)
+        streak_image.image_button('Design/coin.png')
+        streak_text = TEXT("Streaks: " + str(streak_count), 210, 750, 50, black)
+        streak_text.display_text()
+
+        # Task bar
+        if taskboard_visible:
+            # Draw the taskboard
+            pygame.draw.rect(screen, grey, taskboard)
+
+            # draw the tasks for the current page
+            for i in range(maximum_task_per_page):
+                task_index = current_page * maximum_task_per_page + i
+                if task_index < len(tasks):
+                    task = tasks[task_index]
+                    # circle
+                    circle_pos = (taskboard.x + 15, taskboard.y + 70 + i * 30)
+                    text_pos = (taskboard.x + 30, taskboard.y + 65 + i * 30)
+                    text_rect = font.get_rect(task)
+                    text_size = text_rect.size
+                    # rect covers the circle and text
+                    task_rect = pygame.Rect(circle_pos[0] - 5, circle_pos[1] - 5, 20 + text_size[0], text_size[1])
+                    if task_rect.collidepoint(pygame.mouse.get_pos()):
+                        #filled circle
+                        pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5)
+                    else:
+                        #hollow circle
+                        pygame.draw.circle(screen, (0, 0, 0), circle_pos, 5, 1)
+                    font.render_to(screen, text_pos, task, (0, 0, 0))
+
+            # Add task button
+            add_task_text.display_text()
+            add_task_button.image_button('Design/add_task_button.png')
+
+            #Task Up & Down Button
+            uparrow.image_button('Design/add_task_button.png')
+            downarrow.image_button('Design/add_task_button.png')
+            
+
+
         pygame.display.flip()
 
     pygame.quit()
@@ -524,10 +556,9 @@ def screen_user_input():
     run = True
     while run:
 
-        global user_input,todo1,todo2,todo3
+        global user_input, tasks
         user_input_limit = 300
         user_input_length = input_text.check_text_length(user_input)
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -546,28 +577,7 @@ def screen_user_input():
                 if event.key == pygame.K_BACKSPACE:
                     user_input = user_input[:-1]
                 if event.key == pygame.K_RETURN:
-                    todo_lists.append(user_input)
-                    if len(todo_lists) >= 3+1:
-                        todo1 = todo_lists[1]
-                        todo2 = todo_lists[2]
-                        todo3 = todo_lists[3]
-                        todo1_text.update_text(todo1)
-                        todo2_text.update_text(todo2)
-                        todo3_text.update_text(todo3)
-                        checklist_1_button.update_color(blue)
-                        checklist_2_button.update_color(blue)
-                        checklist_3_button.update_color(blue)
-                    elif len(todo_lists) == 2+1:
-                        todo1 = todo_lists[1]
-                        todo2 = todo_lists[2]
-                        todo1_text.update_text(todo1)
-                        todo2_text.update_text(todo2)
-                        checklist_1_button.update_color(blue)
-                        checklist_2_button.update_color(blue)
-                    else: 
-                        todo1 = todo_lists[1]
-                        todo1_text.update_text(todo1)
-                        checklist_1_button.update_color(blue)
+                    tasks.append(user_input)
                     save_game_state()
                     user_input = ""
                     input_text.update_text(user_input)
@@ -593,8 +603,28 @@ def screen_settings():
     decrease_pomodoro = BUTTON(245, 350, 40, 20)
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
+    notification = TEXT("", 1320, 450, 30, blue)
 
+    if can_change_ambience('sunny'):
+        sunny_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        sunny_bg.image_button('Design/lock.png')
+            # false, locked
+
+    if can_change_ambience('night'):
+        night_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        night_bg.image_button('Design/lock.png')
+            # false, locked
     
+    if can_change_ambience('snow'):
+        snow_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        snow_bg.image_button('Design/lock.png')
+            # false, locked
 
     while run:
 
@@ -605,6 +635,7 @@ def screen_settings():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+            
                 #pomodoro settings
                 if increase_pomodoro.check_for_input(pygame.mouse.get_pos()):
                     if pomodoro_length == 3600:
@@ -640,6 +671,12 @@ def screen_settings():
                         new_selected_background = 'Design/sunny.png'
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
+
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
                             
                 if night_bg.check_for_input(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
@@ -649,6 +686,12 @@ def screen_settings():
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
 
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
+
                 if snow_bg.check_for_input(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
 
@@ -656,6 +699,12 @@ def screen_settings():
                         new_selected_background = 'Design/snow.png'
                         screen_home(new_selected_background)
                         print("Switching to homescreen")
+
+                    else:
+                        print("Not enough level")
+                        notification.update_text("Level up some more :(")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
 
                 if music_1.check_for_input(pygame.mouse.get_pos()):
                     play_music('Songs/music_1.MP3')
@@ -666,13 +715,19 @@ def screen_settings():
 
                 if mute.check_for_input(pygame.mouse.get_pos()):
                     print("Mute")
+                    pygame.mixer.music.pause()
+
+                if unmute.check_for_input(pygame.mouse.get_pos()):
+                    print("Unmute")
+                    pygame.mixer.music.unpause()
 
                 #back button
                 if back_button.check_for_input(pygame.mouse.get_pos()):
                     current_seconds = pomodoro_length
                     screen_home(selected_background)
                     print("Returning to homescreen")
-
+            if event.type == CLEAR_NOTIFICATION_EVENT:
+                notification.update_text("")
         
         bg('Design/setting page.png')
         back.image_button('Design/back-button.png')
@@ -680,29 +735,7 @@ def screen_settings():
         minute_text2.display_text()
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
-
- 
-
-        if can_change_ambience('sunny'):
-            sunny_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            sunny_bg.image_button('Design/lock.png')
-             # false, locked
-
-        if can_change_ambience('night'):
-            night_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            night_bg.image_button('Design/lock.png')
-             # false, locked
-        
-        if can_change_ambience('snow'):
-            snow_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            snow_bg.image_button('Design/lock.png')
-             # false, locked
+        notification.display_text()
 
         pygame.display.flip()
 
@@ -891,6 +924,10 @@ def screen_shop():
     fertilizer = BUTTON(120, 570, 120, 50)
     watering_can = POPUP('Design/watering-can.png',800)
     fertilize = POPUP('Design/fertilizer.png',800)
+    textcoins = TEXT("5", 140, 400, 30, black)
+    textsoil = TEXT("10", 140, 565, 30, black)
+    notification = TEXT("", 800, 100, 80, black)
+
 
     #comment
     comment = Comment(screen_width / 2, 100)
@@ -915,7 +952,11 @@ def screen_shop():
                             save_game_state()
                     else:
                         comment.show_for_duration('Your soil is already moist!  No need to water right now.', screen)
-
+                        print("Not enough coins")
+                        notification.update_text("!Not enough coins!")
+                        
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
+                        
                 if fertilizer.check_for_input(pygame.mouse.get_pos()):
                     if fertilizer_count < fertilizer_required:
                         #spend coins(30) to proceed with the action
@@ -925,9 +966,13 @@ def screen_shop():
                             coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
                             coins_text.display_text()
                             save_game_state()
+
                     else:
                         comment.show_for_duration('Your plant looks vibrant and healthy!  No need for more fertilizer now.', screen)
-                
+                        print("Not enough coins")
+                        notification.update_text("!Not enough coins!")
+                        pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)
+                                        
                 #check if plant should grow
                 if water_count >= water_required and fertilizer_count >= fertilizer_required:
                     growth_plant()
@@ -969,7 +1014,10 @@ def screen_shop():
         fertilize.show()
         #display comment
         comment.show(screen)
-
+        textsoil.display_text()
+        textcoins.display_text()
+        notification.display_text()    
+        
         pygame.display.flip()
 
     pygame.quit()
