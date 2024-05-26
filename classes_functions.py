@@ -201,6 +201,9 @@ class Comment:
     def update_color(self, new_color):
         self.color = new_color
 
+    def update_font_size(self, new_size):
+        self.font_size = new_size
+
     def display(self, screen):
         if self.text and pygame.time.get_ticks() - self.last_update_time < self.duration:
             text = TEXT(self.text, self.x, self.y, self.font_size, self.color, font=self.font)

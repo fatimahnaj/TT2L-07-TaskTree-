@@ -973,11 +973,12 @@ def screen_shop():
     fertilize = POPUP('Design/fertilizer.png',800)
     textcoins = TEXT("5", 140, 400, 30, black)
     textsoil = TEXT("10", 140, 565, 30, black)
-    notification = TEXT("", 800, 100, 80, black)
-
 
     #comment
     comment = Comment(screen_width / 2, 100)
+    notification = Comment(screen_width / 2, 100)
+    notification.update_color(black)
+    notification.update_font_size(35)
     
     while run:
         
@@ -998,9 +999,7 @@ def screen_shop():
                             coins_text.display_text()
                             save_game_state()
                         else:
-                            print("Not enough coins")
-                            notification.update_text("!Not enough coins!")   
-                            pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)  # 3000 milliseconds = 3 seconds
+                            notification.show_for_duration('Not Enough Coins !', screen)
 
                     else:
                         comment.show_for_duration('Your soil is already moist!  No need to water right now.', screen)
@@ -1016,9 +1015,7 @@ def screen_shop():
                             save_game_state()
 
                         else:
-                            print("Not enough coins")
-                            notification.update_text("!Not enough coins!")
-                            pygame.time.set_timer(CLEAR_NOTIFICATION_EVENT, 3000)
+                            notification.show_for_duration('Not Enough Coins !', screen)
 
                     else:
                         comment.show_for_duration('Your plant looks vibrant and healthy!  No need for more fertilizer now.', screen)
@@ -1064,9 +1061,9 @@ def screen_shop():
         fertilize.show()
         #display comment
         comment.show(screen)
+        notification.show(screen)
         textsoil.display_text()
-        textcoins.display_text()
-        notification.display_text()    
+        textcoins.display_text()    
         
         pygame.display.flip()
 
