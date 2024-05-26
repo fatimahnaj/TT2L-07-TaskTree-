@@ -1,6 +1,6 @@
 import pygame
 import json
-import datetime
+from datetime import date, timedelta
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -90,7 +90,11 @@ play_music('Songs/music_1.MP3')
 mute = BUTTON(680, 360, 60, 60)
 unmute = BUTTON(830, 360, 60, 60)
 
+#streak
+streak_count = 0
+last_completed_date = date.today().isoformat()
 
+streak_text = TEXT("Streaks: " + str(streak_count), 200, 250, 50, black)
 
 #plant growth 
 plant_stage = 1
@@ -131,14 +135,16 @@ def save_game_state():
         'tasks': tasks,
         'plant_stage': plant_stage,
         'water_count': water_count,
-        'fertilizer_count': fertilizer_count
+        'fertilizer_count': fertilizer_count,
+        'streak_count': 0,
+        'last_completed_date': date.today().isoformat()        
         
     }
     with open('game_state.txt', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks
+    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks, streak_count, last_completed_date
     if os.path.exists('game_state.txt'):
         with open('game_state.txt', 'r') as f:
             game_state = json.load(f)
@@ -149,6 +155,8 @@ def load_game_state():
             plant_stage = game_state.get('plant_stage', 1)
             water_count = game_state.get('water_count', 0)
             fertilizer_count = game_state.get('fertilizer_count', 0)
+            streak_count = game_state.get('streak_count', 0)
+            last_completed_date = game_state.get('last_completed_date', date.today().isoformat())
     else:
         # Initialize game state to default values
         level_bar.level = 0
@@ -158,6 +166,21 @@ def load_game_state():
         plant_stage = 1
         water_count = 0
         fertilizer_count = 0
+        streak_count = 0
+        last_completed_date = date.today().isoformat()
+
+    #update streak count
+    today = date.today()
+    last_completed_date = date.fromisoformat(last_completed_date)
+
+    if today - last_completed_date == timedelta(days=1):
+        streak_count += 1
+    else:
+        streak_count = 0
+
+    game_state['last_completed_date'] = today.isoformat()
+    save_game_state()
+
 
 # background
 selected_background = 'Design/sunny.png'
@@ -453,6 +476,12 @@ def screen_home(new_selected_background):
         coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
 
+        #streak
+        streak_image = BUTTON(10, 700)
+        streak_image.image_button('Design/coin.png')
+        streak_text = TEXT("Streaks: " + str(streak_count), 210, 750, 50, black)
+        streak_text.display_text()
+
         # Task bar
         if taskboard_visible:
             # Draw the taskboard
@@ -534,6 +563,27 @@ def screen_settings():
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
     notification = TEXT("", 1320, 450, 30, blue)
+
+    if can_change_ambience('sunny'):
+        sunny_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        sunny_bg.image_button('Design/lock.png')
+            # false, locked
+
+    if can_change_ambience('night'):
+        night_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        night_bg.image_button('Design/lock.png')
+            # false, locked
+    
+    if can_change_ambience('snow'):
+        snow_bg.image_button('Design/nothing.png')
+        # true, unlocked
+    else: 
+        snow_bg.image_button('Design/lock.png')
+            # false, locked
 
     while run:
 
@@ -645,27 +695,6 @@ def screen_settings():
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
         notification.display_text()
-
-        if can_change_ambience('sunny'):
-            sunny_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            sunny_bg.image_button('Design/lock.png')
-             # false, locked
-
-        if can_change_ambience('night'):
-            night_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            night_bg.image_button('Design/lock.png')
-             # false, locked
-        
-        if can_change_ambience('snow'):
-            snow_bg.image_button('Design/nothing.png')
-            # true, unlocked
-        else: 
-            snow_bg.image_button('Design/lock.png')
-             # false, locked
 
         pygame.display.flip()
 
