@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"level": 0, "level_xp": 0, "coins": 220, "tasks": [], "plant_stage": 3, "water_count": 6, "fertilizer_count": 6, "streak_count": 0, "last_completed_date": "2024-06-02", "seed_chosen": true, "chosen_seed": 1}
-=======
-{"seed_chosen": true, "chosen_seed": 2}
->>>>>>> main
+{"level": 0, "level_xp": 0, "coins": 220, "tasks": [], "plant_stage": 4, "water_count": 0, "fertilizer_count": 0, "streak_count": 0, "last_completed_date": "2024-06-03", "seed_chosen": false, "chosen_seed": 2}
