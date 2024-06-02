@@ -147,17 +147,18 @@ def save_game_state():
         'plant_stage': plant_stage,
         'water_count': water_count,
         'fertilizer_count': fertilizer_count,
-        'streak_count': 0,
-        'last_completed_date': date.today().isoformat()        
-        
+        'streak_count': streak_count,
+        'last_completed_date': last_completed_date,
+        'seed_chosen': seed_chosen,
+        'chosen_seed': chosen_seed
     }
-    with open('game_state.txt', 'w') as f:
+    with open('game_state.json', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, selected_plant_background, tasks, streak_count, last_completed_date
-    if os.path.exists('game_state.txt'):
-        with open('game_state.txt', 'r') as f:
+    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, tasks, streak_count, last_completed_date, seed_chosen, chosen_seed
+    if os.path.exists('game_state.json'):
+        with open('game_state.json', 'r') as f:
             game_state = json.load(f)
             level_bar.level = game_state.get('level', 0)
             level_bar.xp = game_state.get('level_xp', 0)
@@ -168,8 +169,10 @@ def load_game_state():
             fertilizer_count = game_state.get('fertilizer_count', 0)
             streak_count = game_state.get('streak_count', 0)
             last_completed_date = game_state.get('last_completed_date', date.today().isoformat())
+            seed_chosen = game_state.get('seed_chosen', False)
+            chosen_seed = game_state.get('chosen_seed', 0)
     else:
-        # Initialize game state to default values
+        #set game state to default values
         level_bar.level = 0
         level_bar.xp = 0
         coins_bar.coins = 0
@@ -179,32 +182,23 @@ def load_game_state():
         fertilizer_count = 0
         streak_count = 0
         last_completed_date = date.today().isoformat()
+        seed_chosen = False
+        chosen_seed = 0
 
-    #update streak count
+#update streak count
+def update_streak_count():
+    global streak_count, last_completed_date
     today = date.today()
+
     last_completed_date = date.fromisoformat(last_completed_date)
 
-    if today - last_completed_date == timedelta(days=1):
+    if (today - last_completed_date).days == 1:
         streak_count += 1
     else:
         streak_count = 0
 
-    game_state['last_completed_date'] = today.isoformat()
+    last_completed_date = today.isoformat()
     save_game_state()
-
-
-def save_seed_chosen_status():
-    with open('game_state.json', 'w') as f:
-        json.dump({'seed_chosen': seed_chosen, 'chosen_seed': chosen_seed}, f)
-
-
-def load_seed_chosen_status():
-    global seed_chosen, chosen_seed
-    if os.path.exists('game_state.json'):
-        with open('game_state.json', 'r') as f:
-            data = json.load(f)
-            seed_chosen = data.get('seed_chosen', False)
-            chosen_seed = data.get('chosen_seed', 0)
 
 
 # background
@@ -254,7 +248,6 @@ def screen_startup():
     run = True
 
     load_game_state()
-    load_seed_chosen_status()
 
     while run:
         
@@ -550,8 +543,8 @@ def screen_home(new_selected_background):
             #Task Up & Down Button
             uparrow.image_button('Design/add_task_button.png')
             downarrow.image_button('Design/add_task_button.png')
-            
 
+        update_streak_count()    
         pygame.display.flip()
 
     pygame.quit()
@@ -819,7 +812,7 @@ def screen_plant() :
     pygame.quit()
 
 def screen_garden() :
-    global matured_flower,locked_flowers
+    global matured_flower, locked_flowers, seed_chosen
     run = True
 
     dragging = False
@@ -847,16 +840,18 @@ def screen_garden() :
                         dragging = True
                         selected_flower = flower
                         print(f"Flower is clicked")
+
                     #check if the player has finish the flower placement
-
-
                     if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
-
                         finish_placement_button.update_color(blue)
                         locked_flowers.append(selected_flower) #move the selected flower into locked_flowers; the flower now can't be move
                         flowers.pop()
                         matured_flower.pop()
                         print(f"Flower has been locked")
+                        seed_chosen = False
+                        save_game_state
+                        screen_home(selected_background)
+            
                 #player cannot move it anymore flower from locked_flowers
                 for i, flower in enumerate(locked_flowers, start=1):
                     if flower.collidepoint(event.pos):
@@ -938,19 +933,19 @@ def screen_seed() :
                 if seed1.is_clicked(pygame.mouse.get_pos()):
                     chosen_seed = 1
                     seed_chosen = True
-                    save_seed_chosen_status()
+                    save_game_state()
                     screen_plant()
                     print("Seed 1 chosen. Switching to plant screen.")
                 elif seed2.is_clicked(pygame.mouse.get_pos()):
                     chosen_seed = 2
                     seed_chosen = True
-                    save_seed_chosen_status()
+                    save_game_state()
                     screen_plant()
                     print("Seed 2 chosen. Switching to plant screen.")               
                 elif seed3.is_clicked(pygame.mouse.get_pos()):
                     chosen_seed = 3
                     seed_chosen = True
-                    save_seed_chosen_status()
+                    save_game_state()
                     screen_plant()
                     print("Seed 3 chosen. Switching to plant screen.")
                 if quit.is_clicked(pygame.mouse.get_pos()):
