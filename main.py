@@ -764,6 +764,7 @@ def screen_plant() :
                     print("Switching to shop screen.")
                 if transfer_to_garden_button.is_clicked(pygame.mouse.get_pos()):
                     fully_grown_flower.append(selected_flower_img)
+                    save_game_state()
                     screen_garden()
 
         # Update plant image based on the chosen seed
@@ -853,17 +854,14 @@ def screen_garden() :
                         locked_flowers_img.append(fully_grown_flower[0]) #move the selected flower into locked_flowers; the flower now can't be move
                         movable_flowers.pop()
                         fully_grown_flower.pop()
-                        print(f"Flower has been locked")
                 #player cannot move it anymore flower from locked_flowers
                 for flower in locked_flowers_rect:
                     if flower.collidepoint(event.pos):
-                        print(f"Flower cannot be moved")
                         break
             #stop the flower movement if mousebuttonup
             elif event.type == pygame.MOUSEBUTTONUP:
                     for flower in movable_flowers:
                         dragging = False
-                        print(f"Flower is dropped")
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                         mouse_x, mouse_y = event.pos
@@ -904,15 +902,15 @@ def screen_garden() :
 
         finish_placement_button.draw_button()
 
-        #blit the flowers (these flower can be move)
-        for flower in movable_flowers:
-            flower_img = pygame.image.load(fully_grown_flower[0])
-            screen.blit(flower_img, flower)
-
         #blit the flowers that have been locked to its permanent position
         for i, flower in enumerate(locked_flowers_img):
             load_flower_img = pygame.image.load(flower)
             screen.blit(load_flower_img, locked_flowers_rect[i])
+
+        #blit the flowers (these flower can be move)
+        for flower in movable_flowers:
+            flower_img = pygame.image.load(fully_grown_flower[0])
+            screen.blit(flower_img, flower)
 
         # Update the display
         pygame.display.flip()
