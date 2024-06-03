@@ -845,10 +845,10 @@ def screen_plant() :
 def screen_garden() :
     global flower_x, flower_y, flower_width, flower_height, fully_grown_flower, locked_flowers_img, locked_flowers_rect, seed_chosen
     run = True
-
+    zoom_level = 1.0
     dragging = False
     movable_flowers = []
-    finish_placement_button = BUTTON(screen_width-70, screen_height-80, 50, 50, dark_grey)
+    finish_placement_button = BUTTON(screen_width-100, screen_height-80, 50, 50, dark_grey)
     selected_flower = ''
     #receive flower image from fully_grown_flower, store flower's rect into movable flowers (used for further codings)
     for flower in fully_grown_flower:
@@ -862,6 +862,12 @@ def screen_garden() :
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  # Mouse wheel up
+                    zoom_level += 0.1
+                if event.button == 5:  # Mouse wheel down
+                    zoom_level -= 0.1
+                    if zoom_level < 0.1:  # Prevent zooming out too much
+                        zoom_level = 0.1
                 if back_button.is_clicked(pygame.mouse.get_pos()):
                     screen_home(selected_background)
                 #repeat for each flower in movable flowers
@@ -873,7 +879,6 @@ def screen_garden() :
                         print(f"Selected flower = {selected_flower}")
                     #check if the player has finish the flower placement
                     if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
-                        finish_placement_button.update_color(blue)
                         locked_flowers_img.append(fully_grown_flower[0]) #move the selected flower into locked_flowers; the flower now can't be move
                         saving_rect(selected_flower)
                         new_pos = pygame.Rect(flower_x[-1], flower_y[-1], flower_width[-1], flower_height[-1])
@@ -901,20 +906,20 @@ def screen_garden() :
                         selected_flower.x = mouse_x - 20
                         selected_flower.y = mouse_y - 18
 
-        # if flowers <= 10:
+        # if len(locked_flowers_img) <= 10:
         #     zoom_level = 3.0
-        # elif flowers <= 30:
+        # elif len(locked_flowers_img) <= 30:
         #     zoom_level = 2.6
-        # elif flowers <= 60:
+        # elif len(locked_flowers_img) <= 60:
         #     zoom_level = 2.2
-        # elif flowers <= 80:
+        # elif len(locked_flowers_img) <= 80:
         #     zoom_level = 1.8
-        # elif flowers <= 100:
+        # elif len(locked_flowers_img) <= 100:
         #     zoom_level = 1.4
-        # elif flowers <= 130:
-        zoom_level = 1.0
+        # elif len(locked_flowers_img) <= 130:
+        #     zoom_level = 1.0
 
-        screen.fill((228, 255, 209)) # Fill the screen with green color
+        screen.fill((85, 174, 78)) # Fill the screen with green color
         bg = pygame.image.load('Design/garden.png')
         back.image_button('Design/back-button.png')
 
@@ -933,13 +938,20 @@ def screen_garden() :
 
         back.image_button('Design/back-button.png')
 
+        #if flower haven't been locked, the lock button will display
         if movable_flowers != []:
-            finish_placement_button.draw_button()
+            finish_placement_button.image_button('Design/locked.png')
 
         #blit the flowers that have been locked to its permanent position
         for i, flower in enumerate(locked_flowers_img):
-            load_flower_img = pygame.image.load(locked_flowers_img[i])
-            screen.blit(load_flower_img, locked_flowers_rect[i])
+            flower_img = pygame.image.load(locked_flowers_img[i])
+            scaled_width = int(flower_width[i] * zoom_level)
+            scaled_height = int(flower_height[i] * zoom_level)
+            scaled_flower_img = pygame.transform.smoothscale(flower_img, (scaled_width, scaled_height))
+            scaled_x = int((flower_x[i] * zoom_level) + zoomed_main_surface_rect.x)
+            scaled_y = int((flower_y[i] * zoom_level) + zoomed_main_surface_rect.y)
+            scaled_flower_rect = pygame.Rect(scaled_x, scaled_y, scaled_width, scaled_height)
+            screen.blit(scaled_flower_img, scaled_flower_rect.topleft)
 
         #blit the flowers (these flower can be move)
         for flower in movable_flowers:
