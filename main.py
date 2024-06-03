@@ -110,6 +110,10 @@ fertilizer_required = 2
 selected_plant_background = 'Design/plant1.png'
 
 #garden
+flower_x = []
+flower_y = []
+flower_width = []
+flower_height = []
 selected_flower_img = ''
 fully_grown_flower = []
 locked_flowers_img = []
@@ -153,13 +157,18 @@ def save_game_state():
         'streak_count': streak_count,
         'last_completed_date': last_completed_date,
         'seed_chosen': seed_chosen,
-        'chosen_seed': chosen_seed
+        'chosen_seed': chosen_seed,
+        'locked_flowers_img': locked_flowers_img,
+        'flower_x' : flower_x,
+        'flower_y' : flower_y,
+        'flower_width': flower_width,
+        'flower_height': flower_height
     }
     with open('game_state.json', 'w') as f:
         json.dump(game_state, f)
 
 def load_game_state():
-    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, tasks, streak_count, last_completed_date, seed_chosen, chosen_seed
+    global level_bar, coins_bar, plant_stage, water_count, fertilizer_count, tasks, streak_count, last_completed_date, seed_chosen, chosen_seed, locked_flowers_img,flower_x, flower_y, flower_width, flower_height
     if os.path.exists('game_state.json'):
         with open('game_state.json', 'r') as f:
             game_state = json.load(f)
@@ -174,6 +183,11 @@ def load_game_state():
             last_completed_date = game_state.get('last_completed_date', date.today().isoformat())
             seed_chosen = game_state.get('seed_chosen', False)
             chosen_seed = game_state.get('chosen_seed', 0)
+            locked_flowers_img = game_state.get('locked_flowers_img', [])
+            flower_x = game_state.get('flower_x', [])
+            flower_y = game_state.get('flower_y', [])
+            flower_width = game_state.get('flower_width', [])
+            flower_height = game_state.get('flower_height', [])
     else:
         #set game state to default values
         level_bar.level = 0
@@ -187,6 +201,11 @@ def load_game_state():
         last_completed_date = date.today().isoformat()
         seed_chosen = False
         chosen_seed = 0
+        locked_flowers_img = []
+        flower_x = []
+        flower_y = []
+        flower_width = []
+        flower_height = []
 
 #update streak count
 def update_streak_count():
@@ -246,7 +265,14 @@ def growth_plant():
     water_required += 2
     fertilizer_required += 2
 
-#screen functions
+def saving_rect(rect):
+    global flower_x, flower_y, flower_width, flower_height
+    flower_x.append(rect.x)
+    flower_y.append(rect.y)
+    flower_width.append(rect.width)
+    flower_height.append(rect.height)
+
+
 def screen_startup():
     run = True
 
@@ -260,6 +286,10 @@ def screen_startup():
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.is_clicked(pygame.mouse.get_pos()):
+                    #preload the flower rect
+                    for i in range(len(flower_x)):
+                        rect = pygame.Rect(flower_x[i], flower_y[i], flower_width[i], flower_height[i])
+                        locked_flowers_rect.append(rect)
                     screen_home(selected_background)
                     print("Switching to home screen.")
 
@@ -758,6 +788,7 @@ def screen_plant() :
                     print("Switching to shop screen.")
                 if transfer_to_garden_button.is_clicked(pygame.mouse.get_pos()):
                     fully_grown_flower.append(selected_flower_img)
+                    save_game_state()
                     screen_garden()
 
         # Update plant image based on the chosen seed
@@ -812,7 +843,7 @@ def screen_plant() :
     pygame.quit()
 
 def screen_garden() :
-    global fully_grown_flower, locked_flowers_img, locked_flowers_rect, seed_chosen
+    global flower_x, flower_y, flower_width, flower_height, fully_grown_flower, locked_flowers_img, locked_flowers_rect, seed_chosen
     run = True
 
     dragging = False
@@ -839,15 +870,17 @@ def screen_garden() :
                     if flower.collidepoint(event.pos):
                         dragging = True
                         selected_flower = flower
-                        print(f"Flower is clicked")
+                        print(f"Selected flower = {selected_flower}")
                     #check if the player has finish the flower placement
                     if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
                         finish_placement_button.update_color(blue)
-                        locked_flowers_rect.append(selected_flower)
                         locked_flowers_img.append(fully_grown_flower[0]) #move the selected flower into locked_flowers; the flower now can't be move
+                        saving_rect(selected_flower)
+                        new_pos = pygame.Rect(flower_x[-1], flower_y[-1], flower_width[-1], flower_height[-1])
+                        locked_flowers_rect.append(new_pos)
                         movable_flowers.pop()
                         fully_grown_flower.pop()
-                        print(f"Flower has been locked")
+                        print(f"Selected flower has been locked at {locked_flowers_rect[-1]}")
                         seed_chosen = False
                         save_game_state
                         screen_home(selected_background)
@@ -855,13 +888,13 @@ def screen_garden() :
                 #player cannot move it anymore flower from locked_flowers
                 for flower in locked_flowers_rect:
                     if flower.collidepoint(event.pos):
-                        print(f"Flower cannot be moved")
+                        dragging = False
                         break
             #stop the flower movement if mousebuttonup
             elif event.type == pygame.MOUSEBUTTONUP:
                     for flower in movable_flowers:
                         dragging = False
-                        print(f"Flower is dropped")
+                        print(f"Flower dropped at {movable_flowers}")
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                         mouse_x, mouse_y = event.pos
@@ -900,17 +933,18 @@ def screen_garden() :
 
         back.image_button('Design/back-button.png')
 
-        finish_placement_button.draw_button()
+        if movable_flowers != []:
+            finish_placement_button.draw_button()
+
+        #blit the flowers that have been locked to its permanent position
+        for i, flower in enumerate(locked_flowers_img):
+            load_flower_img = pygame.image.load(locked_flowers_img[i])
+            screen.blit(load_flower_img, locked_flowers_rect[i])
 
         #blit the flowers (these flower can be move)
         for flower in movable_flowers:
             flower_img = pygame.image.load(fully_grown_flower[0])
             screen.blit(flower_img, flower)
-
-        #blit the flowers that have been locked to its permanent position
-        for i, flower in enumerate(locked_flowers_img):
-            load_flower_img = pygame.image.load(flower)
-            screen.blit(load_flower_img, locked_flowers_rect[i])
 
         # Update the display
         pygame.display.flip()

@@ -218,3 +218,4 @@ class Comment:
         self.update_text(new_text)
         self.last_update_time = pygame.time.get_ticks()
         self.display(screen)
+
