@@ -81,6 +81,8 @@ quit = BUTTON(1067, 190, 50, 50)
 shop = BUTTON(0, 0)
 shop_button = BUTTON(60, 290, 100, 80)
 shop_back = BUTTON(345, 300, 100,80)
+transfer_to_garden = BUTTON (150, 300)
+transfer_to_garden_button = BUTTON(990,599, 80, 80)
 
 #music
 music_1 = BUTTON(670, 450, 60, 60)
@@ -537,9 +539,9 @@ def screen_home(new_selected_background):
         coins_text.display_text()
 
         #streak
-        streak_image = BUTTON(10, 700)
-        streak_image.image_button('Design/coin.png')
-        streak_text = TEXT("Streaks: " + str(streak_count), 210, 750, 50, black)
+        streak_image = BUTTON(0, 0)
+        streak_image.image_button('Design/streak.png')
+        streak_text = TEXT("Streaks: " + str(streak_count), 270, 730, 50, black)
         streak_text.display_text()
 
         # Task bar
@@ -771,7 +773,6 @@ def screen_settings():
 
 def screen_plant() :
     global plant_stage, chosen_seed, fully_grown_flower, selected_flower_img
-    transfer_to_garden_button = BUTTON(900,550, 100,91, blue)
     run = True
     while run:
 
@@ -835,7 +836,7 @@ def screen_plant() :
         coins_text.display_text()
 
         if plant_stage == 4:
-            transfer_to_garden_button.image_button('Design/next_arrow.png')
+            transfer_to_garden.image_button('Design/next_arrow.png')
 
         pygame.display.flip()
 
