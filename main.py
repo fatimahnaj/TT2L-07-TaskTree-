@@ -191,11 +191,11 @@ def load_game_state():
 #update streak count
 def update_streak_count():
     global streak_count, last_completed_date
+    
     today = date.today()
-
     last_completed_date = date.fromisoformat(last_completed_date)
 
-    if (today - last_completed_date).days == 1:
+    if (today - last_completed_date) == timedelta(days=1):
         streak_count += 1
     else:
         streak_count = 0
