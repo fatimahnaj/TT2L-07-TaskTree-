@@ -1,6 +1,6 @@
 import pygame
 import json
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -13,6 +13,9 @@ screen_width = screen_size[0]
 screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
+
+icon = pygame.image.load('Design/icon.png')
+pygame.display.set_icon(icon)
 
 clock = pygame.time.Clock()
 clock.tick(60)  # Limit frame rate to 60 FPS
@@ -94,8 +97,8 @@ play_music('Songs/music_1.MP3')
 alarm_sound = pygame.mixer.Sound('Songs/Alarm.mp3')
 
 #sounds
-mute = BUTTON(680, 360, 60, 60)
-unmute = BUTTON(830, 360, 60, 60)
+unmute = BUTTON(680, 360, 60, 60)
+mute = BUTTON(830, 360, 60, 60)
 
 #streak
 streak_count = 0
@@ -209,6 +212,7 @@ def load_game_state():
         flower_y = []
         flower_width = []
         flower_height = []
+    update_streak_count()
 
 #update streak count
 def update_streak_count():
@@ -238,13 +242,13 @@ def can_change_ambience(ambience):
         # Compare the required level with your current level
         required_level = ambience_level_required[ambience]
         if level >= required_level:
-            print("You are eligible for", ambience, "ambience.")
+            # print("You are eligible for", ambience, "ambience.")
             return True
         else:
-            print("You need to reach level", required_level, "to access", ambience, "ambience.")
+            # print("You need to reach level", required_level, "to access", ambience, "ambience.")
             return False
     else:
-        print("Ambience not found in the requirements.")  
+        # print("Ambience not found in the requirements.")  
         return False
 
 #internal function (coins)
@@ -328,6 +332,7 @@ def screen_home(new_selected_background):
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
+  
 
     # Create a font
     font = pygame.freetype.Font(None, 24)
@@ -547,6 +552,12 @@ def screen_home(new_selected_background):
         countdown_text.display_text()
         sec_countdown_text.display_text()
 
+        
+
+        current_datetime = datetime.now().strftime("%d %B %Y %H:%M")
+        clock_text = TEXT(current_datetime, 790, 90, 30, dark_grey)
+        clock_text.display_text()
+
 
         #draw level bar
         level_bar.draw(screen)
@@ -601,7 +612,10 @@ def screen_home(new_selected_background):
             uparrow.image_button('Design/up.png')
             downarrow.image_button('Design/down.png')
 
-        update_streak_count()    
+
+        start_stop_button.display_text()
+
+        
         pygame.display.flip()
 
     pygame.quit()
@@ -658,27 +672,6 @@ def screen_settings():
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
     notification = TEXT("", 1320, 450, 30, blue)
-
-    if can_change_ambience('sunny'):
-        sunny_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        sunny_bg.image_button('Design/lock.png')
-            # false, locked
-
-    if can_change_ambience('night'):
-        night_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        night_bg.image_button('Design/lock.png')
-            # false, locked
-    
-    if can_change_ambience('snow'):
-        snow_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        snow_bg.image_button('Design/lock.png')
-            # false, locked
 
     while run:
 
@@ -790,6 +783,27 @@ def screen_settings():
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
         notification.display_text()
+
+        if can_change_ambience('sunny'):
+            sunny_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            sunny_bg.image_button('Design/locked.png')
+                # false, locked
+
+        if can_change_ambience('night'):
+            night_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            night_bg.image_button('Design/locked.png')
+                # false, locked
+        
+        if can_change_ambience('snow'):
+            snow_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            snow_bg.image_button('Design/locked.png')
+                # false, locked
 
         pygame.display.flip()
 
