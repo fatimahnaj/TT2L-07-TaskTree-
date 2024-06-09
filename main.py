@@ -147,7 +147,7 @@ taskboard_visible = True
 
 # Create toggle button
 toggle = BUTTON(0, 0)
-toggle_button = BUTTON (1470, 450, 40, 40)
+toggle_button = BUTTON(1470, 450, 40, 40)
 
 
 #save & load data
