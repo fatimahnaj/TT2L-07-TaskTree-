@@ -92,14 +92,14 @@ class BUTTON:
             image = pygame.image.load(image_link)
             rect_2 = image.get_rect()
             rect_2.topleft = (self.x, self.y)
-            screen.blit(image, (self.center_x,self.center_y))
+            screen.blit(image, (self.x,self.y))
 
     def update_color(self, new_color):
         self.color = new_color
 
     def is_clicked(self,position):
         if not self.disabled:
-            rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
+            rect = pygame.Rect(self.x, self.y, self.width, self.height)
             if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
                 return True
         return False
