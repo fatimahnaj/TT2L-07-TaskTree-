@@ -34,6 +34,7 @@ blue = (39, 39, 89)
 pomodoro_length = 1
 break_length = 3
 timer = 0
+play_music
 
 lap_length = 4
 current_lap = 1
@@ -93,6 +94,7 @@ music_2 = BUTTON(770, 450, 60, 60)
 music_3 = BUTTON(870, 450, 60, 60)
 
 play_music('Songs/music_1.MP3')
+alarm_sound = pygame.mixer.Sound('Songs/Alarm.mp3')
 
 #sounds
 unmute = BUTTON(680, 360, 60, 60)
@@ -144,7 +146,8 @@ tasks = ["Task {}".format(i + 1) for i in range(21)]
 taskboard_visible = True
 
 # Create toggle button
-toggle_button = BUTTON(screen_width-70, screen_height-350, 50, 50, black)
+toggle = BUTTON(0, 0)
+toggle_button = BUTTON (1470, 450, 40, 40)
 
 
 #save & load data
@@ -282,6 +285,17 @@ def delete_rect():
     flower_y.pop()
     flower_width.pop()
     flower_height.pop()
+
+def reset_cycle():
+    global chosen_seed, seed_chosen, plant_stage, water_count, fertilizer_count, current_lap, fully_grown_flower
+    chosen_seed = 0
+    seed_chosen = False
+    plant_stage = 1
+    water_count = 0
+    fertilizer_count = 0
+    current_lap = 0
+    fully_grown_flower = []
+    screen_home(selected_background)
 
 #screen functions
 def screen_startup():
@@ -450,6 +464,7 @@ def screen_home(new_selected_background):
                         elif current_seconds == 0:
                                 if pomodoro:
                                     print("pomodoro completed")
+                                    alarm_sound.play()
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
                                     coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
@@ -463,6 +478,7 @@ def screen_home(new_selected_background):
 
                                 
                                 else:
+                                    alarm_sound.play()
                                     current_seconds = pomodoro_length
                                     pomodoro = True
                                     current_lap += 1
@@ -485,6 +501,7 @@ def screen_home(new_selected_background):
                                     save_game_state()
                                    
                                 else:
+                                    alarm_sound.play()
                                     current_seconds = pomodoro_length
                                     pomodoro = True
                                     started = False
@@ -522,7 +539,8 @@ def screen_home(new_selected_background):
         pomodoro_button.hover_color_change()
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
-        toggle_button.image_button('Design/add_task_button.png')
+        start_stop_button.display_text()
+        toggle.image_button('Design/add_task_button.png')
 
 
         if current_seconds >= 0:
@@ -918,7 +936,7 @@ def screen_garden() :
                         print(f"Selected flower has been locked at {locked_flowers_rect[-1]}")
                         seed_chosen = False
                         save_game_state()
-                        screen_home(selected_background)
+                        reset_cycle()
 
                 # Player cannot move it anymore flower from locked_flowers
                 for flower in locked_flowers_rect:
