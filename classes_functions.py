@@ -1,5 +1,6 @@
 import pygame
 pygame.init()
+pygame.mixer.init()
 
 screen_size = (1540,800)
 screen_width = screen_size[0]
@@ -61,6 +62,8 @@ class BUTTON:
         self.circle_width = circle_width
         self.disabled = False
 
+        self.click_sound = pygame.mixer.Sound('Songs/Button.mp3')
+
     def draw_button(self):
         if not self.disabled:
             set_button = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -102,6 +105,7 @@ class BUTTON:
         if not self.disabled:
             rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
             if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
+                self.click_sound.play()
                 return True
         return False
     
