@@ -210,11 +210,11 @@ def load_game_state():
 #update streak count
 def update_streak_count():
     global streak_count, last_completed_date
+    
     today = date.today()
-
     last_completed_date = date.fromisoformat(last_completed_date)
 
-    if (today - last_completed_date).days == 1:
+    if (today - last_completed_date) == timedelta(days=1):
         streak_count += 1
     else:
         streak_count = 0
@@ -279,6 +279,7 @@ def delete_rect():
     flower_width.pop()
     flower_height.pop()
 
+#screen functions
 def screen_startup():
     run = True
 
@@ -864,6 +865,7 @@ def screen_garden() :
         movable_flowers.append(flower_rect)
 
     while run:
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -892,6 +894,8 @@ def screen_garden() :
                         print(f"Selected flower = {selected_flower}")
                     # Check if the player has finish the flower placement
                     if finish_placement_button.is_clicked(pygame.mouse.get_pos()):
+                        finish_placement_button.update_color(blue)
+                        locked_flowers_rect.append(selected_flower)
                         locked_flowers_img.append(fully_grown_flower[0]) #move the selected flower into locked_flowers; the flower now can't be move
                         saving_rect(selected_flower)
                         new_pos = pygame.Rect(flower_x[-1], flower_y[-1], flower_width[-1], flower_height[-1])

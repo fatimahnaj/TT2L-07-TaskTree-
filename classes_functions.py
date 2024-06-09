@@ -91,6 +91,8 @@ class BUTTON:
     def image_button(self,image_link):
         if not self.disabled:
             image = pygame.image.load(image_link)
+            rect_2 = image.get_rect()
+            rect_2.topleft = (self.x, self.y)
             screen.blit(image, (self.center_x,self.center_y))
 
     def update_color(self, new_color):
@@ -216,4 +218,3 @@ class Comment:
         self.update_text(new_text)
         self.last_update_time = pygame.time.get_ticks()
         self.display(screen)
-
