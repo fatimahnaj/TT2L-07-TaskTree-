@@ -290,13 +290,22 @@ def screen_startup():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.is_clicked(pygame.mouse.get_pos()):
-                    #preload the flower rect
+                    #load the saved flower rect (from json)
                     for i in range(len(flower_x)):
                         rect = pygame.Rect(flower_x[i], flower_y[i], flower_width[i], flower_height[i])
                         locked_flowers_rect.append(rect)
+                    
                     screen_home(selected_background)
                     print("Switching to home screen.")
 
@@ -619,6 +628,13 @@ def screen_user_input():
                     user_input = ""
                     input_text.update_text(user_input)
                     screen_home(selected_background)
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
         
         screen.fill(grey)
         back.image_button('Design/back-button.png')
@@ -633,6 +649,8 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
+    global pomodoro_length,break_length,lap_length,current_seconds
+
     run = True
     minute_text1 = TEXT("minute",313,370,15,grey,grey,"DePixelHalbfett.ttf")
     minute_text2 = TEXT("minute",313,530,15,grey,grey,"DePixelHalbfett.ttf")
@@ -640,6 +658,9 @@ def screen_settings():
     decrease_pomodoro = BUTTON(245, 350, 40, 20)
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
+    increase_lap = BUTTON(245, 650, 40, 20)
+    decrease_lap = BUTTON(245, 670, 40, 20)
+    lap_text = TEXT(f"{lap_length:02}",180,660,60,black)
     notification = TEXT("", 1320, 450, 30, blue)
 
     if can_change_ambience('sunny'):
@@ -665,7 +686,6 @@ def screen_settings():
 
     while run:
 
-        global pomodoro_length,break_length,lap_length,current_seconds
 
 
         for event in pygame.event.get():
@@ -699,6 +719,17 @@ def screen_settings():
                         print(break_length)
                     else:
                         break_length = break_length
+                #lap (aka cycle) settings
+                if increase_lap.is_clicked(pygame.mouse.get_pos()):
+                    if lap_length == 5:
+                        lap_length = lap_length
+                    else:
+                        lap_length += 1
+                if decrease_lap.is_clicked(pygame.mouse.get_pos()):
+                    if lap_length > 1:
+                        lap_length -= 1
+                    else:
+                        lap_length = lap_length
                 #ambience buttons
                 if sunny_bg.is_clicked(pygame.mouse.get_pos()):
                      
@@ -765,7 +796,14 @@ def screen_settings():
                     print("Returning to homescreen")
             if event.type == CLEAR_NOTIFICATION_EVENT:
                 notification.update_text("")
-        
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
         bg('Design/setting page.png')
         back.image_button('Design/back-button.png')
         minute_text1.display_text()
@@ -773,6 +811,8 @@ def screen_settings():
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
         notification.display_text()
+        lap_text.display_text()
+        lap_text.update_text((f"{lap_length:02}"))
 
         pygame.display.flip()
 
@@ -797,6 +837,13 @@ def screen_plant() :
                     fully_grown_flower.append(selected_flower_img)
                     save_game_state()
                     screen_garden()
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
 
         # Update plant image based on the chosen seed
         if chosen_seed == 1:
@@ -922,7 +969,13 @@ def screen_garden() :
                     mouse_x, mouse_y = event.pos
                     selected_flower.x = mouse_x - 20
                     selected_flower.y = mouse_y - 18
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
 
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
 
         screen.fill((85, 174, 78))  # Fill the screen with green color
         bg = pygame.image.load('Design/garden_zoom.png')
@@ -1031,7 +1084,16 @@ def screen_shop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.is_clicked(pygame.mouse.get_pos()):
+                    screen_home(selected_background)
                 if shop_back.is_clicked(pygame.mouse.get_pos()):
                     screen_plant()
                     print("Returning to plant screen")
@@ -1101,6 +1163,7 @@ def screen_shop():
         
         
         bg(selected_plant_background)
+        back.image_button('Design/back-button.png')
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
         watering_can.show()
@@ -1111,6 +1174,13 @@ def screen_shop():
         textsoil.display_text()
         textcoins.display_text()    
         
+        #Coins text
+        coins_image = BUTTON(10, 105)
+        coins_image.image_button('Design/coin.png')
+        
+        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+        coins_text.display_text()
+
         pygame.display.flip()
 
     pygame.quit()

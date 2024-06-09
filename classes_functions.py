@@ -48,7 +48,6 @@ class TEXT:
         text_width, text_height = font.size(input)
         return text_width
     
-#fatim punya button
 class BUTTON:
     def __init__(self, x, y, width=0, height=0, color=black, circle_width=3):
         self.x = x
@@ -63,10 +62,10 @@ class BUTTON:
 
     def draw_button(self):
         if not self.disabled:
-            set_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            set_button = pygame.Rect(self.center_x,self.center_y, self.width, self.height)
             pygame.draw.rect(screen, self.color, set_button)
         else:
-            disabled_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            disabled_button = pygame.Rect(self.center_x,self.center_y, self.width, self.height)
             pygame.draw.rect(screen, (200, 200, 200), disabled_button)
 
     def draw_hoverbutton(self,position,hover_color):
