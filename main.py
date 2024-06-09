@@ -14,6 +14,9 @@ screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
 
+icon = pygame.image.load('Design/icon.png')
+pygame.display.set_icon(icon)
+
 clock = pygame.time.Clock()
 clock.tick(60)  # Limit frame rate to 60 FPS
 
@@ -92,8 +95,8 @@ music_3 = BUTTON(870, 450, 60, 60)
 play_music('Songs/music_1.MP3')
 
 #sounds
-mute = BUTTON(680, 360, 60, 60)
-unmute = BUTTON(830, 360, 60, 60)
+unmute = BUTTON(680, 360, 60, 60)
+mute = BUTTON(830, 360, 60, 60)
 
 #streak
 streak_count = 0
@@ -206,6 +209,7 @@ def load_game_state():
         flower_y = []
         flower_width = []
         flower_height = []
+    update_streak_count()
 
 #update streak count
 def update_streak_count():
@@ -584,7 +588,7 @@ def screen_home(new_selected_background):
             uparrow.image_button('Design/up.png')
             downarrow.image_button('Design/down.png')
 
-        update_streak_count()    
+        
         pygame.display.flip()
 
     pygame.quit()
