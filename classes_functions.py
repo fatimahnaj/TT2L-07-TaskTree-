@@ -1,5 +1,6 @@
 import pygame
 pygame.init()
+pygame.mixer.init()
 
 screen_size = (1540,800)
 screen_width = screen_size[0]
@@ -37,8 +38,11 @@ class TEXT:
         self.text = new_text
 
     def is_clicked(self,position):
+        rect = self.rect.get_rect()
+        rect.center = (self.x, self.y)
         self.rect = self.rect.get_rect(center=(self.x,self.y))
-        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+
+        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
         return False
     
@@ -59,6 +63,8 @@ class BUTTON:
         self.center_y = self.y - self.height // 2
         self.circle_width = circle_width
         self.disabled = False
+
+        self.click_sound = pygame.mixer.Sound('Songs/Button.mp3')
 
     def draw_button(self):
         if not self.disabled:
@@ -101,6 +107,7 @@ class BUTTON:
         if not self.disabled:
             rect = pygame.Rect(self.center_x, self.center_y, self.width, self.height)
             if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
+                self.click_sound.play()
                 return True
         return False
     
