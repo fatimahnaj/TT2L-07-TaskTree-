@@ -1,6 +1,6 @@
 import pygame
 import json
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import os
 from classes_functions import *
 from pygame.locals import *
@@ -14,6 +14,9 @@ screen_height = screen_size[1]
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('TaskTree')
 
+icon = pygame.image.load('Design/icon.png')
+pygame.display.set_icon(icon)
+
 clock = pygame.time.Clock()
 clock.tick(60)  # Limit frame rate to 60 FPS
 
@@ -24,13 +27,13 @@ black = (0,0,0)
 grey = (231,231,245)
 dark_grey = (94,99,122)
 blue = (39, 39, 89)
+white = (255,255,255)
 
 #in seconds
-#pomodoro_length = 1800
-#break_length = 300
 pomodoro_length = 1
 break_length = 3
 timer = 0
+play_music
 
 lap_length = 4
 current_lap = 1
@@ -90,10 +93,11 @@ music_2 = BUTTON(770, 450, 60, 60)
 music_3 = BUTTON(870, 450, 60, 60)
 
 play_music('Songs/music_1.MP3')
+alarm_sound = pygame.mixer.Sound('Songs/Alarm.mp3')
 
 #sounds
-mute = BUTTON(680, 360, 60, 60)
-unmute = BUTTON(830, 360, 60, 60)
+unmute = BUTTON(680, 360, 60, 60)
+mute = BUTTON(830, 360, 60, 60)
 
 #streak
 streak_count = 0
@@ -141,7 +145,8 @@ tasks = ["Task {}".format(i + 1) for i in range(21)]
 taskboard_visible = True
 
 # Create toggle button
-toggle_button = BUTTON(screen_width-70, screen_height-350, 50, 50, black)
+toggle = BUTTON(0, 0)
+toggle_button = BUTTON(1470, 450, 40, 40)
 
 
 #save & load data
@@ -206,6 +211,7 @@ def load_game_state():
         flower_y = []
         flower_width = []
         flower_height = []
+    update_streak_count()
 
 #update streak count
 def update_streak_count():
@@ -235,13 +241,13 @@ def can_change_ambience(ambience):
         # Compare the required level with your current level
         required_level = ambience_level_required[ambience]
         if level >= required_level:
-            print("You are eligible for", ambience, "ambience.")
+            # print("You are eligible for", ambience, "ambience.")
             return True
         else:
-            print("You need to reach level", required_level, "to access", ambience, "ambience.")
+            # print("You need to reach level", required_level, "to access", ambience, "ambience.")
             return False
     else:
-        print("Ambience not found in the requirements.")  
+        # print("Ambience not found in the requirements.")  
         return False
 
 #internal function (coins)
@@ -257,7 +263,7 @@ def spend_coins(cost):
 
 
 def growth_plant():
-    global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
+    global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required
 
     plant_stage += 1
     water_count = 0
@@ -278,6 +284,20 @@ def delete_rect():
     flower_y.pop()
     flower_width.pop()
     flower_height.pop()
+
+def reset_cycle():
+    global chosen_seed, seed_chosen, plant_stage, water_count, water_required, fertilizer_count, fertilizer_required, current_lap, fully_grown_flower
+    chosen_seed = 0
+    seed_chosen = False
+    plant_stage = 1
+    water_count = 0
+    water_required = 2
+    fertilizer_count = 0
+    fertilizer_required = 2
+    current_lap = 0
+    fully_grown_flower = []
+    screen_home(selected_background)
+
 
 
 
@@ -539,7 +559,7 @@ def screen_home(new_selected_background):
         break_button.hover_color_change()
         stopwatch_button.hover_color_change()
         start_stop_button.display_text()
-        toggle_button.image_button('Design/add_task_button.png')
+        toggle.image_button('Design/add_task_button.png')
 
 
         if current_seconds >= 0:
@@ -551,6 +571,9 @@ def screen_home(new_selected_background):
         countdown_text.display_text()
         sec_countdown_text.display_text()
 
+        current_datetime = datetime.now().strftime("%d %B %Y %H:%M")
+        clock_text = TEXT(current_datetime, 790, 90, 20, blue, blue, "DePixelHalbfett.ttf")
+        clock_text.display_text()
 
         #draw level bar
         level_bar.draw(screen)
@@ -605,7 +628,8 @@ def screen_home(new_selected_background):
             uparrow.image_button('Design/up.png')
             downarrow.image_button('Design/down.png')
 
-        update_streak_count()    
+        start_stop_button.display_text()
+
         pygame.display.flip()
 
     pygame.quit()
@@ -675,26 +699,6 @@ def screen_settings():
     lap_text = TEXT(f"{lap_length:02}",180,660,60,black)
     notification = TEXT("", 1320, 450, 30, blue)
 
-    if can_change_ambience('sunny'):
-        sunny_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        sunny_bg.image_button('Design/lock.png')
-            # false, locked
-
-    if can_change_ambience('night'):
-        night_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        night_bg.image_button('Design/lock.png')
-            # false, locked
-    
-    if can_change_ambience('snow'):
-        snow_bg.image_button('Design/nothing.png')
-        # true, unlocked
-    else: 
-        snow_bg.image_button('Design/lock.png')
-            # false, locked
 
     while run:
 
@@ -826,6 +830,27 @@ def screen_settings():
         lap_text.display_text()
         lap_text.update_text((f"{lap_length:02}"))
 
+        if can_change_ambience('sunny'):
+            sunny_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            sunny_bg.image_button('Design/locked.png')
+                # false, locked
+
+        if can_change_ambience('night'):
+            night_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            night_bg.image_button('Design/locked.png')
+                # false, locked
+        
+        if can_change_ambience('snow'):
+            snow_bg.image_button('Design/nothing.png')
+            # true, unlocked
+        else: 
+            snow_bg.image_button('Design/locked.png')
+                # false, locked
+
         pygame.display.flip()
 
     pygame.quit()
@@ -852,7 +877,6 @@ def screen_plant() :
             #mute/unmute alternative
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
-
                     pygame.mixer.music.pause()
                 if event.key == pygame.K_n:
                     pygame.mixer.music.unpause()
@@ -963,8 +987,8 @@ def screen_garden() :
                         fully_grown_flower.pop()
                         print(f"Selected flower has been locked at {locked_flowers_rect[-1]}")
                         seed_chosen = False
+                        reset_cycle()
                         save_game_state()
-                        screen_home(selected_background)
 
                 # Player cannot move it anymore flower from locked_flowers
                 for flower in locked_flowers_rect:
@@ -1035,7 +1059,7 @@ def screen_garden() :
 
 def screen_seed() :
     run = True
-    global chosen_seed, seed_chosen, selected_plant_background
+    global chosen_seed, seed_chosen
     seed1 = BUTTON(600, 430, 90, 100)
     seed2 = BUTTON(800, 430, 90, 100)
     seed3 = BUTTON(1000, 430, 90, 100)
@@ -1109,6 +1133,7 @@ def screen_shop():
                 if shop_back.is_clicked(pygame.mouse.get_pos()):
                     screen_plant()
                     print("Returning to plant screen")
+                #water the plants
                 if water_plant.is_clicked(pygame.mouse.get_pos()):
                     if water_count < water_required:
                         #spend coins(30) to proceed with the action

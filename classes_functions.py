@@ -37,6 +37,9 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
+    def update_color(self, new_color):
+        self.color = new_color
+
     def is_clicked(self,position):
         rect = self.rect.get_rect()
         rect.center = (self.x, self.y)
