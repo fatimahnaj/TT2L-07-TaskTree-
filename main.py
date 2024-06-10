@@ -279,14 +279,18 @@ def delete_rect():
     flower_width.pop()
     flower_height.pop()
 
+
+
 #screen functions
 def screen_startup():
+    after_button = POPUP("Design/frontpage-button-after.png", 3000, (19,19))
+    start_ticking = False
+    time_passed = 0
     run = True
 
     load_game_state()
 
     while run:
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -301,17 +305,25 @@ def screen_startup():
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.is_clicked(pygame.mouse.get_pos()):
+                    after_button.trigger()
+                    start_ticking = True
+
                     #load the saved flower rect (from json)
                     for i in range(len(flower_x)):
                         rect = pygame.Rect(flower_x[i], flower_y[i], flower_width[i], flower_height[i])
                         locked_flowers_rect.append(rect)
-                    
-                    screen_home(selected_background)
-                    print("Switching to home screen.")
+
+            #counting the time passd
+            if event.type == pygame.USEREVENT and start_ticking:
+                time_passed += 1
 
         bg('Design/frontpage.png')
         start.image_button('Design/frontpage-button1.png')
-        
+
+        after_button.show_img()
+        if time_passed == 1 :
+            screen_home(selected_background)
+
         pygame.display.flip()
 
     pygame.quit()
@@ -819,7 +831,7 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
-    global plant_stage, chosen_seed, fully_grown_flower, selected_flower_img
+    global plant_stage, chosen_seed, fully_grown_flower, selected_flower_img, selected_plant_background
     run = True
     while run:
 
@@ -1023,7 +1035,7 @@ def screen_garden() :
 
 def screen_seed() :
     run = True
-    global chosen_seed, seed_chosen
+    global chosen_seed, seed_chosen, selected_plant_background
     seed1 = BUTTON(600, 430, 90, 100)
     seed2 = BUTTON(800, 430, 90, 100)
     seed3 = BUTTON(1000, 430, 90, 100)
@@ -1064,7 +1076,7 @@ def screen_seed() :
     pygame.quit()
 
 def screen_shop():
-    global water_count, fertilizer_count, water_required, fertilizer_required
+    global water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
     run = True
     water_plant = BUTTON(120, 400, 120, 50)
     fertilizer = BUTTON(120, 570, 120, 50)
@@ -1087,10 +1099,10 @@ def screen_shop():
             #mute/unmute alternative
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_m:
-
                     pygame.mixer.music.pause()
                 if event.key == pygame.K_n:
                     pygame.mixer.music.unpause()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.is_clicked(pygame.mouse.get_pos()):
                     screen_home(selected_background)
@@ -1102,7 +1114,7 @@ def screen_shop():
                         #spend coins(30) to proceed with the action
                         if spend_coins(5):
                             water_count += 1
-                            watering_can.trigger()
+                            watering_can.trigger() #requirements are met
                             coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
                             coins_text.display_text()
                             save_game_state()
@@ -1166,8 +1178,8 @@ def screen_shop():
         back.image_button('Design/back-button.png')
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
-        watering_can.show()
-        fertilize.show()
+        watering_can.show_img()
+        fertilize.show_img()
         #display comment
         comment.show(screen)
         notification.show(screen)
