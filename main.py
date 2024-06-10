@@ -27,10 +27,9 @@ black = (0,0,0)
 grey = (231,231,245)
 dark_grey = (94,99,122)
 blue = (39, 39, 89)
+white = (255,255,255)
 
 #in seconds
-#pomodoro_length = 1800
-#break_length = 300
 pomodoro_length = 1
 break_length = 3
 timer = 0
@@ -264,7 +263,7 @@ def spend_coins(cost):
 
 
 def growth_plant():
-    global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
+    global plant_stage, water_count, fertilizer_count, water_required, fertilizer_required
 
     plant_stage += 1
     water_count = 0
@@ -287,40 +286,64 @@ def delete_rect():
     flower_height.pop()
 
 def reset_cycle():
-    global chosen_seed, seed_chosen, plant_stage, water_count, fertilizer_count, current_lap, fully_grown_flower
+    global chosen_seed, seed_chosen, plant_stage, water_count, water_required, fertilizer_count, fertilizer_required, current_lap, fully_grown_flower
     chosen_seed = 0
     seed_chosen = False
     plant_stage = 1
     water_count = 0
+    water_required = 2
     fertilizer_count = 0
+    fertilizer_required = 2
     current_lap = 0
     fully_grown_flower = []
     screen_home(selected_background)
 
+
+
+
 #screen functions
 def screen_startup():
+    after_button = POPUP("Design/frontpage-button-after.png", 3000, (19,19))
+    start_ticking = False
+    time_passed = 0
     run = True
 
     load_game_state()
 
     while run:
-        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
             #start button
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.is_clicked(pygame.mouse.get_pos()):
-                    #preload the flower rect
+                    after_button.trigger()
+                    start_ticking = True
+
+                    #load the saved flower rect (from json)
                     for i in range(len(flower_x)):
                         rect = pygame.Rect(flower_x[i], flower_y[i], flower_width[i], flower_height[i])
                         locked_flowers_rect.append(rect)
-                    screen_home(selected_background)
-                    print("Switching to home screen.")
+
+            #counting the time passd
+            if event.type == pygame.USEREVENT and start_ticking:
+                time_passed += 1
 
         bg('Design/frontpage.png')
         start.image_button('Design/frontpage-button1.png')
-        
+
+        after_button.show_img()
+        if time_passed == 1 :
+            screen_home(selected_background)
+
         pygame.display.flip()
 
     pygame.quit()
@@ -332,7 +355,6 @@ def screen_home(new_selected_background):
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
-  
 
     # Create a font
     font = pygame.freetype.Font(None, 24)
@@ -464,7 +486,6 @@ def screen_home(new_selected_background):
                         elif current_seconds == 0:
                                 if pomodoro:
                                     print("pomodoro completed")
-                                    alarm_sound.play()
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
                                     coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
@@ -478,7 +499,6 @@ def screen_home(new_selected_background):
 
                                 
                                 else:
-                                    alarm_sound.play()
                                     current_seconds = pomodoro_length
                                     pomodoro = True
                                     current_lap += 1
@@ -501,7 +521,6 @@ def screen_home(new_selected_background):
                                     save_game_state()
                                    
                                 else:
-                                    alarm_sound.play()
                                     current_seconds = pomodoro_length
                                     pomodoro = True
                                     started = False
@@ -552,12 +571,9 @@ def screen_home(new_selected_background):
         countdown_text.display_text()
         sec_countdown_text.display_text()
 
-        
-
         current_datetime = datetime.now().strftime("%d %B %Y %H:%M")
-        clock_text = TEXT(current_datetime, 790, 90, 30, dark_grey)
+        clock_text = TEXT(current_datetime, 790, 90, 20, blue, blue, "DePixelHalbfett.ttf")
         clock_text.display_text()
-
 
         #draw level bar
         level_bar.draw(screen)
@@ -612,10 +628,8 @@ def screen_home(new_selected_background):
             uparrow.image_button('Design/up.png')
             downarrow.image_button('Design/down.png')
 
-
         start_stop_button.display_text()
 
-        
         pygame.display.flip()
 
     pygame.quit()
@@ -650,6 +664,13 @@ def screen_user_input():
                     user_input = ""
                     input_text.update_text(user_input)
                     screen_home(selected_background)
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
         
         screen.fill(grey)
         back.image_button('Design/back-button.png')
@@ -664,6 +685,8 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
+    global pomodoro_length,break_length,lap_length,current_seconds
+
     run = True
     minute_text1 = TEXT("minute",313,370,15,grey,grey,"DePixelHalbfett.ttf")
     minute_text2 = TEXT("minute",313,530,15,grey,grey,"DePixelHalbfett.ttf")
@@ -671,11 +694,14 @@ def screen_settings():
     decrease_pomodoro = BUTTON(245, 350, 40, 20)
     increase_break = BUTTON(245, 487, 40, 20)
     decrease_break = BUTTON(245, 510, 40, 20)
+    increase_lap = BUTTON(245, 650, 40, 20)
+    decrease_lap = BUTTON(245, 670, 40, 20)
+    lap_text = TEXT(f"{lap_length:02}",180,660,60,black)
     notification = TEXT("", 1320, 450, 30, blue)
+
 
     while run:
 
-        global pomodoro_length,break_length,lap_length,current_seconds
 
 
         for event in pygame.event.get():
@@ -709,6 +735,17 @@ def screen_settings():
                         print(break_length)
                     else:
                         break_length = break_length
+                #lap (aka cycle) settings
+                if increase_lap.is_clicked(pygame.mouse.get_pos()):
+                    if lap_length == 5:
+                        lap_length = lap_length
+                    else:
+                        lap_length += 1
+                if decrease_lap.is_clicked(pygame.mouse.get_pos()):
+                    if lap_length > 1:
+                        lap_length -= 1
+                    else:
+                        lap_length = lap_length
                 #ambience buttons
                 if sunny_bg.is_clicked(pygame.mouse.get_pos()):
                      
@@ -775,7 +812,14 @@ def screen_settings():
                     print("Returning to homescreen")
             if event.type == CLEAR_NOTIFICATION_EVENT:
                 notification.update_text("")
-        
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
         bg('Design/setting page.png')
         back.image_button('Design/back-button.png')
         minute_text1.display_text()
@@ -783,6 +827,8 @@ def screen_settings():
         convert_time(pomodoro_length,180,330,60)
         convert_time(break_length,180,495,60)
         notification.display_text()
+        lap_text.display_text()
+        lap_text.update_text((f"{lap_length:02}"))
 
         if can_change_ambience('sunny'):
             sunny_bg.image_button('Design/nothing.png')
@@ -810,7 +856,7 @@ def screen_settings():
     pygame.quit()
 
 def screen_plant() :
-    global plant_stage, chosen_seed, fully_grown_flower, selected_flower_img
+    global plant_stage, chosen_seed, fully_grown_flower, selected_flower_img, selected_plant_background
     run = True
     while run:
 
@@ -828,6 +874,12 @@ def screen_plant() :
                     fully_grown_flower.append(selected_flower_img)
                     save_game_state()
                     screen_garden()
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
 
         # Update plant image based on the chosen seed
         if chosen_seed == 1:
@@ -935,8 +987,8 @@ def screen_garden() :
                         fully_grown_flower.pop()
                         print(f"Selected flower has been locked at {locked_flowers_rect[-1]}")
                         seed_chosen = False
-                        save_game_state()
                         reset_cycle()
+                        save_game_state()
 
                 # Player cannot move it anymore flower from locked_flowers
                 for flower in locked_flowers_rect:
@@ -953,7 +1005,13 @@ def screen_garden() :
                     mouse_x, mouse_y = event.pos
                     selected_flower.x = mouse_x - 20
                     selected_flower.y = mouse_y - 18
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
 
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
 
         screen.fill((85, 174, 78))  # Fill the screen with green color
         bg = pygame.image.load('Design/garden_zoom.png')
@@ -1042,7 +1100,7 @@ def screen_seed() :
     pygame.quit()
 
 def screen_shop():
-    global water_count, fertilizer_count, water_required, fertilizer_required
+    global water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
     run = True
     water_plant = BUTTON(120, 400, 120, 50)
     fertilizer = BUTTON(120, 570, 120, 50)
@@ -1062,16 +1120,26 @@ def screen_shop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            #mute/unmute alternative
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_m:
+                    pygame.mixer.music.pause()
+                if event.key == pygame.K_n:
+                    pygame.mixer.music.unpause()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.is_clicked(pygame.mouse.get_pos()):
+                    screen_home(selected_background)
                 if shop_back.is_clicked(pygame.mouse.get_pos()):
                     screen_plant()
                     print("Returning to plant screen")
+                #water the plants
                 if water_plant.is_clicked(pygame.mouse.get_pos()):
                     if water_count < water_required:
                         #spend coins(30) to proceed with the action
                         if spend_coins(5):
                             water_count += 1
-                            watering_can.trigger()
+                            watering_can.trigger() #requirements are met
                             coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
                             coins_text.display_text()
                             save_game_state()
@@ -1132,16 +1200,24 @@ def screen_shop():
         
         
         bg(selected_plant_background)
+        back.image_button('Design/back-button.png')
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
-        watering_can.show()
-        fertilize.show()
+        watering_can.show_img()
+        fertilize.show_img()
         #display comment
         comment.show(screen)
         notification.show(screen)
         textsoil.display_text()
         textcoins.display_text()    
         
+        #Coins text
+        coins_image = BUTTON(10, 105)
+        coins_image.image_button('Design/coin.png')
+        
+        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
+        coins_text.display_text()
+
         pygame.display.flip()
 
     pygame.quit()

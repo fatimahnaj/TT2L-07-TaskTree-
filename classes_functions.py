@@ -37,6 +37,9 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
+    def update_color(self, new_color):
+        self.color = new_color
+
     def is_clicked(self,position):
         rect = self.rect.get_rect()
         rect.center = (self.x, self.y)
@@ -52,7 +55,6 @@ class TEXT:
         text_width, text_height = font.size(input)
         return text_width
     
-#fatim punya button
 class BUTTON:
     def __init__(self, x, y, width=0, height=0, color=black, circle_width=3):
         self.x = x
@@ -69,10 +71,10 @@ class BUTTON:
 
     def draw_button(self):
         if not self.disabled:
-            set_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            set_button = pygame.Rect(self.x,self.y, self.width, self.height)
             pygame.draw.rect(screen, self.color, set_button)
         else:
-            disabled_button = pygame.Rect(self.x, self.y, self.width, self.height)
+            disabled_button = pygame.Rect(self.x,self.y, self.width, self.height)
             pygame.draw.rect(screen, (200, 200, 200), disabled_button)
 
     def draw_hoverbutton(self,position,hover_color):
@@ -161,26 +163,43 @@ class Coins():
         self.coins +=increment
         
 class POPUP:
-    def __init__(self,image,max_duration):
+    def __init__(self,image,max_duration,pos=(0,0)):
         self.show_popup = False
         self.start_time = 0
         self.max_duration = max_duration  
-        self.image = image
+        self.x = pos[0]
+        self.y = pos[1]
+        if image == None:
+            self.image = ""
+        else:
+            self.image = image
 
+    #used when the reuirements are met
     def trigger(self):
         self.show_popup = True
         self.start_time = pygame.time.get_ticks()
 
-    def show(self):
+    def show_img(self):
         if self.show_popup:
                 current_time = pygame.time.get_ticks()
                 if current_time - self.start_time < self.max_duration:
                     # Load the image
                     image = pygame.image.load(self.image).convert_alpha()
                     # Calculate its position to center it on the screen
-                    rect = image.get_rect(center=(screen_width / 2, screen_height / 2))
-                    # Blit the image
-                    screen.blit(image, rect)
+                    rect = image.get_rect()
+                    screen.blit(image, (self.x,self.y))
+                else:
+                    self.show_popup = False
+
+    def show_text(self,text,x,y,size,color=black):
+            if self.show_popup:
+                current_time = pygame.time.get_ticks()
+                if current_time - self.start_time < self.max_duration:
+                    #load the texts
+                    font = pygame.font.Font("DePixelHalbfett.ttf",size)
+                    rect = font.render(f"{text}", True, color)
+                    rect_text = rect.get_rect(center=(x,y))
+                    screen.blit(rect, rect_text)
                 else:
                     self.show_popup = False
 
