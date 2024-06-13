@@ -349,13 +349,15 @@ def screen_startup():
     pygame.quit()
 
 def screen_home(new_selected_background):
-    global selected_background 
+    global selected_background,current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
     selected_background = new_selected_background
     pomodoro_button = TEXT("pomodoro",675,120,20,black,blue)
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
-
+    lap_indicator = TEXT(f"lap :", 960, 305, 10, black, black, "DePixelHalbfett.ttf")
+    current_lap_text = TEXT(current_lap, 967, 323, 13, black, black, "DePixelHalbfett.ttf")
+    lap_length_text = TEXT(f"/{lap_length}", 980, 325, 10, black, black, "DePixelHalbfett.ttf")
     # Create a font
     font = pygame.freetype.Font(None, 24)
 
@@ -375,7 +377,6 @@ def screen_home(new_selected_background):
     run = True
     while run:
 
-        global current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
         
         if seed_chosen:
             plant_button.enable()
@@ -560,6 +561,10 @@ def screen_home(new_selected_background):
         stopwatch_button.hover_color_change()
         start_stop_button.display_text()
         toggle.image_button('Design/add_task_button.png')
+        lap_indicator.display_text()
+        current_lap_text.display_text()
+        current_lap_text.update_text(current_lap)
+        lap_length_text.display_text()
 
 
         if current_seconds >= 0:
@@ -572,7 +577,7 @@ def screen_home(new_selected_background):
         sec_countdown_text.display_text()
 
         current_datetime = datetime.now().strftime("%d %B %Y %H:%M")
-        clock_text = TEXT(current_datetime, 790, 90, 20, blue, blue, "DePixelHalbfett.ttf")
+        clock_text = TEXT(current_datetime, 790, 30, 20, white, white, "DePixelHalbfett.ttf")
         clock_text.display_text()
 
         #draw level bar
