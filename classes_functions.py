@@ -191,14 +191,14 @@ class POPUP:
                 else:
                     self.show_popup = False
 
-    def show_text(self,text,x,y,size,color=black):
+    def show_text(self,text,size,color=black):
             if self.show_popup:
                 current_time = pygame.time.get_ticks()
                 if current_time - self.start_time < self.max_duration:
                     #load the texts
                     font = pygame.font.Font("DePixelHalbfett.ttf",size)
                     rect = font.render(f"{text}", True, color)
-                    rect_text = rect.get_rect(center=(x,y))
+                    rect_text = rect.get_rect(center=(self.x,self.y))
                     screen.blit(rect, rect_text)
                 else:
                     self.show_popup = False
