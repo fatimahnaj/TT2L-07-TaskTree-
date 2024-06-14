@@ -37,8 +37,9 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
-    def update_color(self, new_color):
-        self.color = new_color
+    def update_color(self, new_normal_color, new_hover_color):
+        self.normal_color = new_normal_color
+        self.hover_color = new_hover_color
 
     def is_clicked(self,position):
         rect = self.rect.get_rect()
