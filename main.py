@@ -988,6 +988,8 @@ def screen_garden() :
     zoom_level = 1.0
     dragging = False
     movable_flowers = []
+    cannot_switchscreen = POPUP(None, 900, (800, 200))
+    lock_instruction = TEXT("Lock your flower -->", screen_width-220, screen_height-70, 20, yellow,yellow)
     finish_placement_button = BUTTON(screen_width-100, screen_height-80, 50, 50, dark_grey)
     selected_flower = ''
 
@@ -1017,7 +1019,10 @@ def screen_garden() :
                         if zoom_level < 1.0:  # Prevent zooming out too much
                             zoom_level = 1.0
                 if back_button.is_clicked(pygame.mouse.get_pos()):
-                    screen_home(selected_background)
+                    if movable_flowers != []:
+                        cannot_switchscreen.trigger()
+                    else:
+                        screen_home(selected_background)
                 # Repeat for each flower in movable flowers
                 for flower in movable_flowers:
                     # Check whether any flower is clicked
@@ -1035,7 +1040,6 @@ def screen_garden() :
                         locked_flowers_rect.append(new_pos)
                         movable_flowers.remove(selected_flower)
                         fully_grown_flower.pop()
-                        print(f"Selected flower has been locked at {locked_flowers_rect[-1]}")
                         seed_chosen = False
                         reset_cycle()
                         save_game_state()
@@ -1067,6 +1071,7 @@ def screen_garden() :
         bg = pygame.image.load('Design/garden_zoom.png')
         back.image_button('Design/back-button.png')
 
+
         main_surface = pygame.Surface((1540, 800))  # Crop/frame and make it center
         main_surface.blit(bg, (0, 0))
         new_width = int(main_surface.get_width() * zoom_level)
@@ -1081,10 +1086,13 @@ def screen_garden() :
         screen.blit(zoomed_main_surface, zoomed_main_surface_rect.topleft)
 
         back.image_button('Design/back-button.png')
+        cannot_switchscreen.show_text("Lock your flower first !",20,yellow)
 
         # If flower hasn't been locked, the lock button will display
         if movable_flowers != []:
             finish_placement_button.image_button('Design/locked.png')
+            if locked_flowers_img == []:
+                lock_instruction.display_text()
 
         # Blit the flowers that have been locked to their permanent position
         for i, flower in enumerate(locked_flowers_img):
