@@ -43,7 +43,6 @@ class TEXT:
     def is_clicked(self,position):
         rect = self.rect.get_rect()
         rect.center = (self.x, self.y)
-        self.rect = self.rect.get_rect(center=(self.x,self.y))
 
         if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
