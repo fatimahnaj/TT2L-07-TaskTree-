@@ -356,7 +356,7 @@ def screen_home(new_selected_background):
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
     start_stop_button = TEXT("START",775,270,30,black)
     lap_indicator = TEXT(f"lap :", 960, 305, 10, black, black, "DePixelHalbfett.ttf")
-    current_lap_text = TEXT(current_lap, 967, 323, 13, black, black, "DePixelHalbfett.ttf")
+    current_lap_text = TEXT(current_lap - 1, 967, 323, 13, black, black, "DePixelHalbfett.ttf")
     lap_length_text = TEXT(f"/{lap_length}", 980, 325, 10, black, black, "DePixelHalbfett.ttf")
     # Create a font
     font = pygame.freetype.Font(None, 24)
@@ -393,12 +393,13 @@ def screen_home(new_selected_background):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 #check if start/stop button is clicked, toggle the pomodoro
                 if start_stop_button.is_clicked(pygame.mouse.get_pos()): 
-                    if started:
+                    if started: #if the timer has started, clicking it will cause the timer to stop
                         started = False
                         start_stop_button.update_text("START")
-                    else:
-                        started = True
+                    else: #if the timer hasn't started yet, clicking it will cause the timer to start
+                        started = True 
                         start_stop_button.update_text("STOP")
+                        current_lap = 1
                 #display pomodoro, stop the break/stopwatch
                 if pomodoro_button.is_clicked(pygame.mouse.get_pos()):
                     if started == False:
@@ -478,15 +479,15 @@ def screen_home(new_selected_background):
 
             #counting the time
             if event.type == pygame.USEREVENT and started:
-                if stopwatch:
+                if stopwatch: #time will increase by 1 each second (stopwatch)
                     current_seconds += 1
-                else:
+                else: #time will drop by 1 each second (pomodoro and break)
                     if current_lap < lap_length:
                         if current_seconds > 0:
                             current_seconds -= 1
                         elif current_seconds == 0:
                                 if pomodoro:
-                                    print("pomodoro completed")
+                                    print("one round of pomodoro completed")
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
                                     coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
@@ -498,16 +499,17 @@ def screen_home(new_selected_background):
                                     pomodoro = False
                                     save_game_state()
 
-                                
                                 else:
                                     current_seconds = pomodoro_length
                                     pomodoro = True
                                     current_lap += 1
                                     print(current_lap)
+
+                    #for the final lap
                     elif current_lap == lap_length:
-                        if current_seconds > 0:
+                        if current_seconds > 0: #when pomodoro/break is still not finished, time will still ticking
                             current_seconds -= 1
-                        elif current_seconds == 0:
+                        elif current_seconds == 0: #when pomodoro/break is finished, time stopped ticking
                                 if pomodoro:
                                     print("pomodoro completed")
                                     coins_bar.addCoins(30)
@@ -523,6 +525,7 @@ def screen_home(new_selected_background):
                                    
                                 else:
                                     current_seconds = pomodoro_length
+                                    current_lap += 1
                                     pomodoro = True
                                     started = False
                                     start_stop_button.update_text("START")
@@ -563,7 +566,7 @@ def screen_home(new_selected_background):
         toggle.image_button('Design/add_task_button.png')
         lap_indicator.display_text()
         current_lap_text.display_text()
-        current_lap_text.update_text(current_lap)
+        current_lap_text.update_text(current_lap - 1)
         lap_length_text.display_text()
 
 
@@ -690,7 +693,7 @@ def screen_user_input():
     pygame.quit()
 
 def screen_settings():
-    global pomodoro_length,break_length,lap_length,current_seconds
+    global pomodoro_length,break_length,lap_length,current_seconds,current_lap
 
     run = True
     minute_text1 = TEXT("minute",313,370,15,grey,grey,"DePixelHalbfett.ttf")
@@ -742,11 +745,13 @@ def screen_settings():
                         break_length = break_length
                 #lap (aka cycle) settings
                 if increase_lap.is_clicked(pygame.mouse.get_pos()):
+                    current_lap = 1
                     if lap_length == 5:
                         lap_length = lap_length
                     else:
                         lap_length += 1
                 if decrease_lap.is_clicked(pygame.mouse.get_pos()):
+                    current_lap = 1
                     if lap_length > 1:
                         lap_length -= 1
                     else:
