@@ -37,13 +37,13 @@ class TEXT:
     def update_text(self, new_text):
         self.text = new_text
 
-    def update_color(self, new_color):
-        self.color = new_color
+    def update_color(self, new_normal_color, new_hover_color):
+        self.normal_color = new_normal_color
+        self.hover_color = new_hover_color
 
     def is_clicked(self,position):
         rect = self.rect.get_rect()
         rect.center = (self.x, self.y)
-        self.rect = self.rect.get_rect(center=(self.x,self.y))
 
         if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top, rect.bottom):
             return True
@@ -191,14 +191,14 @@ class POPUP:
                 else:
                     self.show_popup = False
 
-    def show_text(self,text,x,y,size,color=black):
+    def show_text(self,text,size,color=black):
             if self.show_popup:
                 current_time = pygame.time.get_ticks()
                 if current_time - self.start_time < self.max_duration:
                     #load the texts
                     font = pygame.font.Font("DePixelHalbfett.ttf",size)
                     rect = font.render(f"{text}", True, color)
-                    rect_text = rect.get_rect(center=(x,y))
+                    rect_text = rect.get_rect(center=(self.x,self.y))
                     screen.blit(rect, rect_text)
                 else:
                     self.show_popup = False
