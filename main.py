@@ -1067,7 +1067,6 @@ def screen_garden() :
                 if event.key == pygame.K_n:
                     pygame.mixer.music.unpause()
 
-        screen.fill((85, 174, 78))  # Fill the screen with green color
         bg = pygame.image.load('Design/garden_zoom.png')
         back.image_button('Design/back-button.png')
 
