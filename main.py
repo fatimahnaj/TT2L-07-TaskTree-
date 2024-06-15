@@ -54,6 +54,7 @@ back_button = BUTTON((screen_width-115),75,110,100)
 point_per_second = 1/60
 level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
+level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
 
 #Coins 
 coins_per_task = 30
@@ -105,7 +106,8 @@ mute = BUTTON(830, 360, 60, 60)
 streak_count = 0
 last_completed_date = date.today().isoformat()
 
-streak_text = TEXT("Streaks: " + str(streak_count), 200, 250, 50, black)
+streak_text = TEXT("Streaks: " + str(streak_count), 270, 730, 50, black)
+
 
 #plant growth 
 plant_stage = 1
@@ -296,9 +298,8 @@ def reset_cycle():
     water_required = 2
     fertilizer_count = 0
     fertilizer_required = 2
-    current_lap = 0
+    current_lap = 1
     fully_grown_flower = []
-    screen_home(selected_background)
 
 
 
@@ -516,7 +517,6 @@ def screen_home(new_selected_background):
                                     stopwatch_button.update_color(black,blue)
                                     pomodoro = False
                                     save_game_state()
-
                                 
                                 else:
                                     current_seconds = pomodoro_length
@@ -627,8 +627,8 @@ def screen_home(new_selected_background):
 
         #level bar
         level_bar.draw(screen)
-        level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
         level_text.display_text()
+        level_text.update_text("Level " + str(level_bar.level))
 
         
         #Coins
@@ -641,8 +641,8 @@ def screen_home(new_selected_background):
         #streak
         streak_image = BUTTON(0, 0)
         streak_image.image_button('Design/streak.png')
-        streak_text = TEXT("Streaks: " + str(streak_count), 270, 730, 50, black)
         streak_text.display_text()
+        streak_text.update_text("Streaks: " + str(streak_count))
 
         # Task bar
         if taskboard_visible:
@@ -800,6 +800,8 @@ def screen_settings():
                 if sunny_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('sunny')
                     coins_text.update_color(black,black)
+                    level_text.update_color(black,black)
+                    streak_text.update_color(black,black)
 
                     if res == True:
                         new_selected_background = 'Design/sunny.png'
@@ -815,6 +817,8 @@ def screen_settings():
                 if night_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
                     coins_text.update_color(white,white)
+                    level_text.update_color(white,white)
+                    streak_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/night.png'
@@ -830,6 +834,8 @@ def screen_settings():
                 if snow_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
                     coins_text.update_color(white,white)
+                    level_text.update_color(white,white)
+                    streak_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/snow.png'
@@ -992,6 +998,8 @@ def screen_garden() :
     movable_flowers = []
     cannot_switchscreen = POPUP(None, 900, (800, 200))
     lock_instruction = TEXT("Lock your flower -->", screen_width-220, screen_height-70, 20, yellow,yellow)
+    flower_instruction_1 = TEXT("<-- Drag and drop your flower", 190,40, 20, yellow,yellow)
+    flower_instruction_2 = TEXT("to the designated area. ", 200,70, 20, yellow,yellow)
     finish_placement_button = BUTTON(screen_width-100, screen_height-80, 50, 50, dark_grey)
     selected_flower = ''
 
@@ -1092,6 +1100,8 @@ def screen_garden() :
             finish_placement_button.image_button('Design/locked.png')
             if locked_flowers_img == []:
                 lock_instruction.display_text()
+                flower_instruction_1.display_text()
+                flower_instruction_2.display_text()
 
         # Blit the flowers that have been locked to their permanent position
         for i, flower in enumerate(locked_flowers_img):
