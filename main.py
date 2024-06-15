@@ -43,8 +43,6 @@ current_lap = 1
 current_seconds = pomodoro_length
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
-started = False
-stopwatch = False
 pomodoro = True
 
 settings = BUTTON(0,0)
@@ -56,6 +54,7 @@ back_button = BUTTON((screen_width-115),75,110,100)
 point_per_second = 1/60
 level_xp_increment = 10
 level_bar = LevelBar(60, 80, 200, 30, 0)
+level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
 
 #Coins 
 coins_per_task = 30
@@ -78,6 +77,7 @@ snow_bg = BUTTON(1450, 330, 50, 50)
 
 plant = BUTTON(0, 0)
 plant_button = BUTTON(90, 290, 70, 70)
+plant_button_deselect = BUTTON(0,0)
 garden = BUTTON(0, 0)
 garden_button = BUTTON(90, 490, 70, 70)
 seed = BUTTON(0, 0)
@@ -106,7 +106,8 @@ mute = BUTTON(830, 360, 60, 60)
 streak_count = 0
 last_completed_date = date.today().isoformat()
 
-streak_text = TEXT("Streaks: " + str(streak_count), 200, 250, 50, black)
+streak_text = TEXT("Streaks: " + str(streak_count), 270, 730, 50, black)
+
 
 #plant growth 
 plant_stage = 1
@@ -297,9 +298,8 @@ def reset_cycle():
     water_required = 2
     fertilizer_count = 0
     fertilizer_required = 2
-    current_lap = 0
+    current_lap = 1
     fully_grown_flower = []
-    screen_home(selected_background)
 
 
 
@@ -352,9 +352,10 @@ def screen_startup():
     pygame.quit()
 
 def screen_home(new_selected_background):
-    global selected_background,current_seconds,started,timer,stopwatch,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
-    selected_background = new_selected_background
+    global selected_background,current_seconds,started,pomodoro,lap_length,current_lap,pomodoro_length,break_length,taskboard_visible
 
+    #buttons and variables used in this screen only
+    selected_background = new_selected_background
     pomodoro_button = TEXT("pomodoro",675,120,20,blue,blue)
     break_button = TEXT("break",790,120,20,black,blue)
     stopwatch_button = TEXT("stopwatch",905,120,20,black,blue)
@@ -364,34 +365,26 @@ def screen_home(new_selected_background):
     lap_length_text = TEXT(f"/{lap_length}", 980, 325, 10, blue, blue, "DePixelHalbfett.ttf")
     coins_noti = POPUP(None,1000,(300,200))
     lap_noti = POPUP(None,1500,(790,140))
-
-    # Create a font
-    font = pygame.freetype.Font(None, 24)
-
-    # Create a variable to store the current page
-    current_page = 0
-
-    # Create a taskboard
-    taskboard = pygame.Rect(1000, 500, 500, 250)
-
-    maximum_task_per_page = 5
-
+    manual_break = False
+    started = False
+    stopwatch = False
     comment1 = Comment(260, 380)
     comment1.update_color((255, 219, 108))
     comment2 = Comment(290, 410)
     comment2.update_color((255, 219, 88))
 
+    #Taskboard
+    # Create a font
+    font = pygame.freetype.Font(None, 24)
+    # Create a variable to store the current taskboard page
+    current_page = 0
+    # Create a taskboard
+    taskboard = pygame.Rect(1000, 500, 500, 250)
+    maximum_task_per_page = 5
+
+
     run = True
     while run:
-
-        
-        if seed_chosen:
-            plant_button.enable()
-        else:
-            plant_button.disable()
-            comment1.show_for_duration('<<<  Please choose', screen)
-            comment2.show_for_duration('your seed first!', screen)
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -414,6 +407,7 @@ def screen_home(new_selected_background):
                     pomodoro_button.update_color(blue,blue)
                     break_button.update_color(black,blue)
                     stopwatch_button.update_color(black,blue)
+                    manual_break = False
                     if started == False:
                         started = False
                         current_seconds = pomodoro_length
@@ -427,6 +421,7 @@ def screen_home(new_selected_background):
                     pomodoro_button.update_color(black,blue)
                     break_button.update_color(blue,blue)
                     stopwatch_button.update_color(black,blue)
+                    manual_break = True
                     if started == False:
                         started = False
                         current_seconds = break_length
@@ -440,6 +435,7 @@ def screen_home(new_selected_background):
                     pomodoro_button.update_color(black,blue)
                     break_button.update_color(black,blue)
                     stopwatch_button.update_color(blue,blue)
+                    manual_break = False
                     if started == False:
                         started = False
                         current_seconds = timer
@@ -511,8 +507,7 @@ def screen_home(new_selected_background):
                                     lap_noti.trigger()
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
-                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                                    coins_text.display_text()
+                                    coins_text.update_text("Coins: " + str(coins_bar.coins))
 
                                     level_bar.addXP(20)
                                     level_bar.draw(screen)
@@ -522,7 +517,6 @@ def screen_home(new_selected_background):
                                     stopwatch_button.update_color(black,blue)
                                     pomodoro = False
                                     save_game_state()
-
                                 
                                 else:
                                     current_seconds = pomodoro_length
@@ -543,8 +537,7 @@ def screen_home(new_selected_background):
                                     coins_noti.trigger()
                                     lap_noti.trigger()
                                     coins_bar.addCoins(30)
-                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                                    coins_text.display_text()
+                                    coins_text.update_text("Coins: " + str(coins_bar.coins))
                                     
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     level_bar.addXP(20)
@@ -591,7 +584,14 @@ def screen_home(new_selected_background):
 
         bg(selected_background)
         settings.image_button('Design/setting-button1.png')
-        plant.image_button('Design/plant-button.png')
+        if seed_chosen:
+            plant_button.enable()
+            plant.image_button('Design/plant-button.png')
+        else:
+            plant_button.disable()
+            plant_button_deselect.image_button('Design/plant-button-deselect.png')
+            comment1.show_for_duration('<<<  Please choose', screen)
+            comment2.show_for_duration('your seed first!', screen)
         garden.image_button('Design/garden-button.png')
         seed.image_button('Design/seed-button.png')
         comment1.show(screen)
@@ -602,9 +602,9 @@ def screen_home(new_selected_background):
         start_stop_button.hover_color_change()
         toggle.image_button('Design/add_task_button.png')
         coins_noti.show_text("+30 coins",20,yellow)
-        lap_noti.show_text("finished 1 lap of pomodoro",8,dark_blue)
+        lap_noti.show_text("Switching to break",8,dark_blue)
         start_stop_button.display_text()
-        if not stopwatch:
+        if not stopwatch and not manual_break:
             lap_indicator.display_text()
             current_lap_text.display_text()
             current_lap_text.update_text(current_lap-1)
@@ -627,22 +627,22 @@ def screen_home(new_selected_background):
 
         #level bar
         level_bar.draw(screen)
-        level_text = TEXT("Level " + str(level_bar.level), 200, 50, 50, black)
         level_text.display_text()
+        level_text.update_text("Level " + str(level_bar.level))
 
         
         #Coins
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         #streak
         streak_image = BUTTON(0, 0)
         streak_image.image_button('Design/streak.png')
-        streak_text = TEXT("Streaks: " + str(streak_count), 270, 730, 50, black)
         streak_text.display_text()
+        streak_text.update_text("Streaks: " + str(streak_count))
 
         # Task bar
         if taskboard_visible:
@@ -798,8 +798,10 @@ def screen_settings():
                         lap_length = lap_length
                 #ambience buttons
                 if sunny_bg.is_clicked(pygame.mouse.get_pos()):
-                     
                     res = can_change_ambience('sunny')
+                    coins_text.update_color(black,black)
+                    level_text.update_color(black,black)
+                    streak_text.update_color(black,black)
 
                     if res == True:
                         new_selected_background = 'Design/sunny.png'
@@ -814,6 +816,9 @@ def screen_settings():
                             
                 if night_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
+                    coins_text.update_color(white,white)
+                    level_text.update_color(white,white)
+                    streak_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/night.png'
@@ -828,6 +833,9 @@ def screen_settings():
 
                 if snow_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
+                    coins_text.update_color(white,white)
+                    level_text.update_color(white,white)
+                    streak_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/snow.png'
@@ -972,8 +980,8 @@ def screen_plant() :
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         if plant_stage == 4:
             transfer_to_garden.image_button('Design/next_arrow.png')
@@ -990,6 +998,8 @@ def screen_garden() :
     movable_flowers = []
     cannot_switchscreen = POPUP(None, 900, (800, 200))
     lock_instruction = TEXT("Lock your flower -->", screen_width-220, screen_height-70, 20, yellow,yellow)
+    flower_instruction_1 = TEXT("<-- Drag and drop your flower", 190,40, 20, yellow,yellow)
+    flower_instruction_2 = TEXT("to the designated area. ", 200,70, 20, yellow,yellow)
     finish_placement_button = BUTTON(screen_width-100, screen_height-80, 50, 50, dark_grey)
     selected_flower = ''
 
@@ -1084,14 +1094,14 @@ def screen_garden() :
         # Blit the scaled main surface to the screen
         screen.blit(zoomed_main_surface, zoomed_main_surface_rect.topleft)
 
-        back.image_button('Design/back-button.png')
-        cannot_switchscreen.show_text("Lock your flower first !",20,yellow)
 
         # If flower hasn't been locked, the lock button will display
         if movable_flowers != []:
             finish_placement_button.image_button('Design/locked.png')
             if locked_flowers_img == []:
                 lock_instruction.display_text()
+                flower_instruction_1.display_text()
+                flower_instruction_2.display_text()
 
         # Blit the flowers that have been locked to their permanent position
         for i, flower in enumerate(locked_flowers_img):
@@ -1109,6 +1119,8 @@ def screen_garden() :
             flower_img = pygame.image.load(fully_grown_flower[0])
             screen.blit(flower_img, flower)
 
+        back.image_button('Design/back-button.png')
+        cannot_switchscreen.show_text("Lock your flower first !",20,yellow)
         # Update the display
         pygame.display.flip()
 
@@ -1157,10 +1169,12 @@ def screen_seed() :
     pygame.quit()
 
 def screen_shop():
-    global water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background
-    run = True
-    water_plant = BUTTON(120, 400, 120, 50)
-    fertilizer = BUTTON(120, 570, 120, 50)
+    global water_count, fertilizer_count, water_required, fertilizer_required, selected_plant_background, plant_stage
+    #buttons and texts to be displayed
+    water_plant = BUTTON(120, 400, 190, 50)
+    water_plant_clicked = POPUP('Design/watering_plant_button.png',250,(0,0))
+    fertilizer = BUTTON(120, 570, 190, 50)
+    fertilizer_clicked = POPUP('Design/fertilize_button.png',250,(0,0))
     watering_can = POPUP('Design/watering-can.png',800)
     fertilize = POPUP('Design/fertilizer.png',800)
     textcoins = TEXT("5", 140, 400, 30, black)
@@ -1172,6 +1186,7 @@ def screen_shop():
     notification.update_color(black)
     notification.update_font_size(35)
     
+    run = True
     while run:
         
         for event in pygame.event.get():
@@ -1192,13 +1207,13 @@ def screen_shop():
                     print("Returning to plant screen")
                 #water the plants
                 if water_plant.is_clicked(pygame.mouse.get_pos()):
+                    water_plant_clicked.trigger()
                     if water_count < water_required:
                         #spend coins(30) to proceed with the action
                         if spend_coins(5):
                             water_count += 1
                             watering_can.trigger() #requirements are met
-                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                            coins_text.display_text()
+                            coins_text.update_text("Coins: " + str(coins_bar.coins))
                             save_game_state()
                         else:
                             notification.show_for_duration('Not Enough Coins !', screen)
@@ -1207,13 +1222,13 @@ def screen_shop():
                         comment.show_for_duration('Your soil is already moist!  No need to water right now.', screen)
 
                 if fertilizer.is_clicked(pygame.mouse.get_pos()):
+                    fertilizer_clicked.trigger()
                     if fertilizer_count < fertilizer_required:
                         #spend coins(30) to proceed with the action
                         if spend_coins(10):
                             fertilizer_count += 1
                             fertilize.trigger()
-                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                            coins_text.display_text()
+                            coins_text.update_text("Coins: " + str(coins_bar.coins))
                             save_game_state()
 
                         else:
@@ -1224,7 +1239,10 @@ def screen_shop():
                                         
                 #check if plant should grow
                 if water_count >= water_required and fertilizer_count >= fertilizer_required:
-                    growth_plant()
+                    if plant_stage < 3:
+                        growth_plant()
+                    elif plant_stage >= 3:
+                        plant_stage = 4
 
         # Update plant image based on the chosen seed
         if chosen_seed == 1:
@@ -1260,6 +1278,8 @@ def screen_shop():
         back.image_button('Design/back-button.png')
         bg('Design/shop-page.png')
         # Check if we need to show the watering can image
+        water_plant_clicked.show_img()
+        fertilizer_clicked.show_img()
         watering_can.show_img()
         fertilize.show_img()
         #display comment
@@ -1272,8 +1292,8 @@ def screen_shop():
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         pygame.display.flip()
 
