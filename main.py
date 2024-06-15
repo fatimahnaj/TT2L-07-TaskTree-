@@ -506,8 +506,7 @@ def screen_home(new_selected_background):
                                     lap_noti.trigger()
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
-                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                                    coins_text.display_text()
+                                    coins_text.update_text("Coins: " + str(coins_bar.coins))
 
                                     level_bar.addXP(20)
                                     level_bar.draw(screen)
@@ -538,8 +537,7 @@ def screen_home(new_selected_background):
                                     coins_noti.trigger()
                                     lap_noti.trigger()
                                     coins_bar.addCoins(30)
-                                    coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                                    coins_text.display_text()
+                                    coins_text.update_text("Coins: " + str(coins_bar.coins))
                                     
                                     # level_bar.addXP(pomodoro_length * point_per_second)
                                     level_bar.addXP(20)
@@ -637,8 +635,8 @@ def screen_home(new_selected_background):
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         #streak
         streak_image = BUTTON(0, 0)
@@ -800,8 +798,8 @@ def screen_settings():
                         lap_length = lap_length
                 #ambience buttons
                 if sunny_bg.is_clicked(pygame.mouse.get_pos()):
-                     
                     res = can_change_ambience('sunny')
+                    coins_text.update_color(black,black)
 
                     if res == True:
                         new_selected_background = 'Design/sunny.png'
@@ -816,6 +814,7 @@ def screen_settings():
                             
                 if night_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('night')
+                    coins_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/night.png'
@@ -830,6 +829,7 @@ def screen_settings():
 
                 if snow_bg.is_clicked(pygame.mouse.get_pos()):
                     res = can_change_ambience('snow')
+                    coins_text.update_color(white,white)
 
                     if res == True:
                         new_selected_background = 'Design/snow.png'
@@ -974,8 +974,8 @@ def screen_plant() :
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         if plant_stage == 4:
             transfer_to_garden.image_button('Design/next_arrow.png')
@@ -1203,8 +1203,7 @@ def screen_shop():
                         if spend_coins(5):
                             water_count += 1
                             watering_can.trigger() #requirements are met
-                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                            coins_text.display_text()
+                            coins_text.update_text("Coins: " + str(coins_bar.coins))
                             save_game_state()
                         else:
                             notification.show_for_duration('Not Enough Coins !', screen)
@@ -1219,8 +1218,7 @@ def screen_shop():
                         if spend_coins(10):
                             fertilizer_count += 1
                             fertilize.trigger()
-                            coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
-                            coins_text.display_text()
+                            coins_text.update_text("Coins: " + str(coins_bar.coins))
                             save_game_state()
 
                         else:
@@ -1284,8 +1282,8 @@ def screen_shop():
         coins_image = BUTTON(10, 105)
         coins_image.image_button('Design/coin.png')
         
-        coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
         coins_text.display_text()
+        coins_text.update_text("Coins: " + str(coins_bar.coins))
 
         pygame.display.flip()
 
