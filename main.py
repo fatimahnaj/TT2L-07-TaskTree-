@@ -33,8 +33,8 @@ yellow = (255, 236, 159)
 white = (255,255,255)
 
 #in seconds
-pomodoro_length = 1
-break_length = 3
+pomodoro_length = 1500
+break_length = 300
 timer = 0
 play_music
 
@@ -63,8 +63,8 @@ coins_text = TEXT("Coins: " + str(coins_bar.coins), 200, 150, 50, black)
 
 ambience_level_required = {
     'sunny' : 0,
-    'night' : 1,
-    'snow' : 2,
+    'night' : 5,
+    'snow' : 15,
 }
 
 start = BUTTON(20, 20)
@@ -374,11 +374,10 @@ def screen_home(new_selected_background):
     comment2.update_color((255, 219, 88))
 
     #Taskboard
-    # Create a font
     font = pygame.freetype.Font(None, 24)
-    # Create a variable to store the current taskboard page
+    # create a variable to store the current taskboard page
     current_page = 0
-    # Create a taskboard
+    # create a taskboard
     taskboard = pygame.Rect(1000, 500, 500, 250)
     maximum_task_per_page = 5
 
@@ -505,11 +504,11 @@ def screen_home(new_selected_background):
                                     alarm_sound.play()
                                     coins_noti.trigger()
                                     lap_noti.trigger()
-                                    # level_bar.addXP(pomodoro_length * point_per_second)
+                                    level_bar.addXP(pomodoro_length * point_per_second)
                                     coins_bar.addCoins(30)
                                     coins_text.update_text("Coins: " + str(coins_bar.coins))
 
-                                    level_bar.addXP(20)
+                                    #level_bar.addXP(20)
                                     level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro_button.update_color(black,blue)
@@ -539,8 +538,8 @@ def screen_home(new_selected_background):
                                     coins_bar.addCoins(30)
                                     coins_text.update_text("Coins: " + str(coins_bar.coins))
                                     
-                                    # level_bar.addXP(pomodoro_length * point_per_second)
-                                    level_bar.addXP(20)
+                                    level_bar.addXP(pomodoro_length * point_per_second)
+                                    #level_bar.addXP(20)
                                     level_bar.draw(screen)
                                     current_seconds = break_length
                                     pomodoro_button.update_color(black,blue)
@@ -1177,8 +1176,8 @@ def screen_shop():
     fertilizer_clicked = POPUP('Design/fertilize_button.png',250,(0,0))
     watering_can = POPUP('Design/watering-can.png',800)
     fertilize = POPUP('Design/fertilizer.png',800)
-    textcoins = TEXT("5", 140, 400, 30, black)
-    textsoil = TEXT("10", 140, 565, 30, black)
+    textcoins = TEXT("15", 140, 400, 30, black)
+    textsoil = TEXT("35", 140, 565, 30, black)
 
     #comment
     comment = Comment(screen_width / 2, 100)
@@ -1210,7 +1209,7 @@ def screen_shop():
                     water_plant_clicked.trigger()
                     if water_count < water_required:
                         #spend coins(30) to proceed with the action
-                        if spend_coins(5):
+                        if spend_coins(15):
                             water_count += 1
                             watering_can.trigger() #requirements are met
                             coins_text.update_text("Coins: " + str(coins_bar.coins))
@@ -1225,7 +1224,7 @@ def screen_shop():
                     fertilizer_clicked.trigger()
                     if fertilizer_count < fertilizer_required:
                         #spend coins(30) to proceed with the action
-                        if spend_coins(10):
+                        if spend_coins(35):
                             fertilizer_count += 1
                             fertilize.trigger()
                             coins_text.update_text("Coins: " + str(coins_bar.coins))
